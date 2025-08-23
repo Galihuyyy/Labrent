@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('transaksi', function (Blueprint $table) {
             $table->id();
+            $table->string('transaksi_code')->nullable();
             $table->foreignId("peminjam_id")->constrained('profile')->onDelete('cascade')->onUpdate('cascade');
             $table->date('tanggal_pinjam');
             $table->date('tanggal_kembali')->nullable();
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('transaksis');
+        Schema::dropIfExists('transaksi');
     }
 };

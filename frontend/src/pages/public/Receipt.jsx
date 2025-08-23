@@ -1,36 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import Navbar from '../../components/fragments/Navbar'
 import { getToken } from '../../utils/getToken'
 import { config } from '../../config'
 import axios from 'axios'
+import NavbarClient from '../../components/fragments/NavbarClient'
 
 export const Receipt = () => {
     const token = getToken()
     const apiUrl = config.API_URL
 
     const [trxPending, setTrxPending] = useState({})
-    const [peminjaman, setPeminjaman] = useState({
-        alat : ''
-    })
-
-    const [dataPeminjaman, setDataPeminjaman] = useState([{
-        peminjaman : {
-            peminjam : {
-                profile : {}
-            }
-        }
-    }])
-
-    const getPeminjaman = () => {
-        axios.get(`${apiUrl}/transaksi`, {headers : {Authorization : `Bearer ${token}`}})
-        .then(res => {
-            console.log(res.data.data)
-            setDataPeminjaman(res.data.data)
-        })
-        .catch(err => {
-            console.log(err)
-        })
-    }
 
     const hapusTrx = (id) => {
 
@@ -52,9 +30,8 @@ export const Receipt = () => {
     const getUser = () => {
         axios.get(`${apiUrl}/user`, {headers : {Authorization : `Bearer ${token}`}})
         .then(res => {
-            setPeminjaman(res.data.transaksi_pending?.peminjaman);
-            setTrxPending(res.data.transaksi_pending);
-            console.log(res.data.transaksi_pending);
+            setTrxPending(res.data.data.transaksi);
+            console.log(res.data.data);
         })
         .catch(err => {
             console.log(err);
@@ -63,12 +40,11 @@ export const Receipt = () => {
 
     useEffect(() => {
         getUser()
-        getPeminjaman()
     }, [])
     
   return (
     <div className="pb-20 px-4 pt-28">
-        <Navbar/>
+        <NavbarClient/>
         {
             !!trxPending &&
                 <main className='mx-auto p-4 rounded border shadow w-11/12 sm:w-1/2 text-neutral-700'>
@@ -82,11 +58,11 @@ export const Receipt = () => {
                     {!!trxPending &&
                         <>
                             <h3 className='text-neutral-500 pb-3 mb-3'>Detail Transaksi</h3>
-                            <h2 className='text-end sm:pe-3 border-b border-indigo-600 pb-3' style={{color:'#4f39f6'}}>Trx ID : {trxPending.id}</h2>
+                            <h2 className='text-end sm:pe-3 border-b border-indigo-600 pb-3' style={{color:'#4f39f6'}}>{trxPending.transaksi_code}</h2>
                             <div className=' pb-3'>
                                 <p className={`${trxPending.status == 'pending' ? 'bg-amber-400 text-amber-700' : ''} w-fit py-1 px-3 mb-0 rounded-pill text-sm font-semibold`}>{trxPending.status}</p>
-                                <h1 className='text-neutral-600 mb-0'>{peminjaman.alat.name}</h1>
-                                <p className="mb-0">{peminjaman.jumlah} Barang</p>
+                                <h1 className='text-neutral-600 mb-0'>{trxPending?.transaksi_details?.alat.name}</h1>
+                                <p className="mb-0">{trxPending?.transaksi_details?.jumlah} Barang</p>
                             </div>
                             <div className='border-b border-indigo-600 pb-3 text-neutral-600 text-sm pt-3'>
                                 <p className='w-1/2'>Hai! Peminjaman kamu masih nunggu konfirmasi nih. Yuk, segera ke lab buat validasi dan lanjutin prosesnya yaa!</p>

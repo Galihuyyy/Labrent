@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Navbar from '../../components/fragments/Navbar'
 import { ProductList } from '../../components/pages/ProductList'
-import Alat from '../../components/pages/Alat'
+import Alat from '../../components/pages/Alat/Alat'
 
 export const Home = () => {
 
@@ -11,9 +11,7 @@ export const Home = () => {
 
   
   return (
-    <div className='font-[poppins] bg-neutral-100'>
-        <Navbar/>
-        
+    <div className='font-[poppins] bg-neutral-100 min-h-svh'>
         {role == "siswa" &&
           <ProductList/>
         }

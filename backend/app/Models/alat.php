@@ -11,7 +11,7 @@ class alat extends Model
 
 
     public function foto_alat () {
-        return $this->hasMany(foto_alat::class, 'alat_id', 'id');
+        return $this->hasOne(foto_alat::class, 'alat_id', 'id');
     }
 
     public function peminjaman () {

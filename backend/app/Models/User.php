@@ -45,8 +45,8 @@ class User extends Authenticatable
         return $this->hasOne(profile::class);
      }
 
-     public function peminjaman() {
-        return $this->hasOne(peminjaman::class, 'peminjam_id', 'id');
+     public function transaksi() {
+        return $this->hasOne(transaksi::class, 'peminjam_id', 'id');
      }
      
     protected function casts(): array

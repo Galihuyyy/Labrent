@@ -11,10 +11,10 @@ const AuthForm = props => {
     const {title, slogan, children, image = {loginImg}} = props
     
   return (
-    <div className="login-container border border-neutral-500 shadow-lg max-w-3xl bg-indigo-50 p-3 flex gap-3 rounded-2xl">
-        <div className="w-full sm:w-1/2 font-[poppins] px-6">
+    <div className="login-container border border-neutral-500 shadow-lg max-w-3xl bg-indigo-50 py-3 px-6 flex gap-3 rounded-2xl">
+        <div className="w-full sm:w-1/2 font-[poppins]">
             <form action="" className='flex items-center flex-col'>
-                <img src={logo} width="120" className='mb-3' />
+                <img src={logo} width="120" className='mb-12' />
                 <h2 className='text-indigo-500'>{title}</h2>
                 <p className='text-sm text-neutral-500 text-center'>{slogan}</p>
                 {children}

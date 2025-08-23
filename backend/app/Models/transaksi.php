@@ -6,14 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class transaksi extends Model
 {
-    protected $table = "transaksi", $guarded=[];
+    protected $table = "transaksi", $guarded = [];
     public $timestamps = false;
 
-    public function peminjaman () {
-        return $this->hasOne(peminjaman::class, 'transaksi_id', 'id');
+    public function transaksi_details()
+    {
+        return $this->hasOne(transaksiDetails::class, 'transaksi_id', 'id');
     }
 
-    public function profile () {
-        return $this->belongsTo(profile::class, 'peminjam_id', 'id');
+    public function peminjam()
+    {
+        return $this->belongsTo(User::class, 'peminjam_id', 'id');
     }
 }

@@ -12,13 +12,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/user', function (Request $request) {
-    $user = User::with(['profile'])->find(auth()->user()->id);
-
-    $transaksi_pending = transaksi::where('peminjam_id', $user->id)->where('status', 'pending')->with(['peminjaman.alat.foto_alat'])->first();
-
+    $user = User::with(['profile', 'transaksi.transaksi_details.alat.foto_alat'])->find(auth()->user()->id);
     return response()->json([
-        'user' => $user,
-        'transaksi_pending'=> $transaksi_pending
+        'message' => "user berhasil didapatkan",
+        'data' => $user
     ]);
     
 })->middleware('auth:sanctum');

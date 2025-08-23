@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\alat;
 use App\Models\Peminjaman;
 use App\Models\Transaksi;
+use App\Models\transaksiDetails;
 use App\Models\Ulasan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +15,11 @@ use Illuminate\Support\Facades\DB;
 class peminjamanController extends Controller
 {
 
-    
+    private function  generateCode($number){
+        $prefix = 'TRX' . date('Ymd') . str_pad($number, 4, '0', STR_PAD_LEFT);
+        return $prefix;
+    }
+
     // 1. Tambah ke cart
     public function addToCart(Request $request)
     {
@@ -71,7 +76,7 @@ class peminjamanController extends Controller
                 ->where('peminjam_id', $user_id)
                 ->update(['transaksi_id' => $transaksi->id]);
         }
-        
+
         if (!$transaksi) {
             return response()->json([
                 "message" => "gagal melakukan checkout"
@@ -82,13 +87,18 @@ class peminjamanController extends Controller
             "message" => "berhasil checkout",
             "transaksi_id" => $transaksi->id
         ], 200);
-        
     }
 
     // 4. Konfirmasi oleh admin
     public function confirmTransaksi($id)
     {
-        $transaksi = Transaksi::findOrFail($id);
+        $transaksi = Transaksi::where('transaksi_code', $id)->first();
+        if (!$transaksi) {
+            return response()->json([
+                'message' => "Transaksi tidak ditemukan"
+            ], 404);
+        }
+
         $transaksi->status = 'dipinjam';
         $transaksi->save();
 
@@ -101,7 +111,7 @@ class peminjamanController extends Controller
     // 5. Pengembalian alat
     public function kembalikan($id)
     {
-        $transaksi = Transaksi::findOrFail($id);
+        $transaksi = Transaksi::where('transaksi_code', $id)->first();
         $transaksi->status = 'dikembalikan';
         $transaksi->tanggal_kembali = now();
         $transaksi->save();
@@ -141,9 +151,9 @@ class peminjamanController extends Controller
 
     public function transaksiPending(string $id)
     {
-        $transaksi = Transaksi::find( $id );
+        $transaksi = Transaksi::find($id);
 
-        $transaksi->delete();
+        $transaksi?->delete();
 
         return response()->json([
             'message' => 'Transaksi berhasil didelete',
@@ -153,12 +163,12 @@ class peminjamanController extends Controller
     public function riwayatTransaksi()
     {
         $profile_id = Auth::user()->profile->id;
-    
+
         $transaksi = Transaksi::with(['peminjaman.alat', 'peminjaman.peminjam.profile'])
             ->where('peminjam_id', $profile_id)
             ->whereIn('status', ['dipinjam', 'dikembalikan'])
             ->get();
-    
+
         return response()->json([
             'message' => 'Riwayat transaksi berhasil diambil',
             'data' => $transaksi
@@ -167,16 +177,16 @@ class peminjamanController extends Controller
 
     public function getTransaksi()
     {
-    
-        $transaksi = Transaksi::with(['peminjaman.alat', 'peminjaman.peminjam.profile'])
+
+        $transaksi = Transaksi::with(['transaksi_details.alat', 'peminjam.profile'])
             ->get();
-    
+
         return response()->json([
             'message' => 'Riwayat transaksi berhasil diambil',
             'data' => $transaksi
         ]);
     }
-    
+
     public function pinjamLangsung(Request $request)
     {
 
@@ -184,9 +194,9 @@ class peminjamanController extends Controller
             'alat_id' => 'required|exists:alat,id',
             'jumlah' => 'required|integer|min:1'
         ]);
-    
+
         $profile_id = Auth::user()->id;
-    
+
         DB::beginTransaction();
         try {
             $transaksi = Transaksi::create([
@@ -194,34 +204,30 @@ class peminjamanController extends Controller
                 'tanggal_pinjam' => now(),
                 'status' => 'pending'
             ]);
-            
-            $peminjaman = Peminjaman::create([
+
+            $transaksi->transaksi_details()->create([
                 'alat_id' => $request->alat_id,
-                'peminjam_id' => $profile_id,
                 'jumlah' => $request->jumlah,
-                'transaksi_id' => $transaksi->id,
             ]);
+
+            $transaksi->transaksi_code = $this->generateCode($transaksi->id);
+            $transaksi->save();
 
 
             $alat = alat::find($request->alat_id);
-            
+
             $alat->stok -= $request->jumlah;
 
             $alat->save();
-    
+
             DB::commit();
             return response()->json([
                 'message' => 'Alat berhasil langsung dipinjam',
-                'data' => [
-                    'transaksi' => $transaksi,
-                    'peminjaman' => $peminjaman
-                ]
+                'data' => $transaksi->load('transaksi_details')
             ], 201);
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json(['message' => 'Gagal pinjam langsung', 'error' => $e->getMessage()], 500);
         }
     }
-    
-
 }

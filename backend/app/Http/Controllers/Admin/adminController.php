@@ -17,7 +17,7 @@ class adminController extends Controller
      */
     public function index()
     {
-        $admins = User::where('role', 'admin')->whereNot('id', '=', auth()->user()->id)->with('profile')->get();
+        $admins = User::where('role', 'admin')->whereNot('id', '=', auth()->user()->id)->with('profile')->orderByDesc('created_at')->get();
 
         return response()->json([
             'message' => 'berhasil mendapatkan data admin',
@@ -71,7 +71,7 @@ class adminController extends Controller
         }
 
         return response()->json([
-            'message' => 'register success'
+            'message' => 'Admin berhasil ditambahkan!'
         ], 200);
             
     }

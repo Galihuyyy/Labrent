@@ -1,2 +1,9 @@
 @import 'tailwindcss';
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.font-montserrat {
+    font-family: 'Montserrat Variable', sans-serif;
+}

@@ -6,9 +6,10 @@ import axios from 'axios'
 import { getToken } from '../../utils/getToken'
 import Carousel from '../../components/Layout/Carousel'
 import { toast, ToastContainer } from 'react-toastify'
+import NavbarClient from '../../components/fragments/NavbarClient'
 
 export const DetailProduct = () => {
-    const id = useParams().id
+    const {id} = useParams()
     const apiUrl = config.API_URL
     const token = getToken()
 
@@ -42,9 +43,7 @@ export const DetailProduct = () => {
         })
         .then(res => {
             console.log(res.data.data)
-            setPeminjaman(res.data.data.peminjaman)
-            setDataAlat(res.data.data.alat)
-            setAlatImages(res.data.data.alat.foto_alat)
+            setDataAlat(res.data.data)
         })
         .catch(err => {
             console.log(err.response.data)
@@ -102,30 +101,6 @@ export const DetailProduct = () => {
         })
     }
 
-    const rating = (rating) => {
-        const star = []
-        let i = 0
-        let tempRating = rating
-
-        while (tempRating >= 1 && i < 5) {
-            star.push('bi-star-fill')
-            tempRating -= 1
-            i++
-        }
-
-        if (tempRating >= 0.25 && tempRating < 0.75 && i < 5) {
-            star.push('bi-star-half')
-            i++
-        }
-
-        while (i < 5) {
-            star.push('bi-star')
-            i++
-        }
-
-        return star
-    }
-
 
     useEffect(() => {
         getDetailAlat()
@@ -133,7 +108,7 @@ export const DetailProduct = () => {
     
   return (
     <div className='pb-20'>
-        <Navbar/>
+        <NavbarClient withSearch={false}></NavbarClient>
         <div className="w-11/12 sm:w-9/12 pt-28 mx-auto font-[poppins] text-neutral-800 pb-20">
             <ToastContainer
                 position='top-center'
@@ -145,11 +120,9 @@ export const DetailProduct = () => {
             </div>
             <div className="rounded w-full shadow-sm border py-12 max-sm:py-2 px-2 sm:px-12 grid grid-cols-1 sm:grid-cols-2">
                 <div className="max-w-md rounded border py-4 bg-neutral-400">
-                    <Carousel>
-                        {alatImages.map((item, i) => (
-                            <img key={i} className='w-full object-contain' src={item} />
-                        ))}
-                    </Carousel>
+                        <img className='w-full object-contain' src={dataAlat.foto_alat} />
+                    {/* <Carousel>
+                    </Carousel> */}
                 </div>
                 <div>
                     <h2>{dataAlat.name}</h2>
@@ -199,36 +172,6 @@ export const DetailProduct = () => {
 
                 </div>
                 
-            </div>
-            <div className='flex flex-col w-full border shadow-sm mt-4 rounded'>
-                {peminjaman.map((item, i) => (
-                    <div key={i} className="ulasan w-full py-3 px-4 border">
-                        <div className="flex gap-x-4 items-center mb-2">
-                            <p className='mb-0 text-xs font-bold'>{item.peminjam.profile.name}</p>
-                            <p className='mb-0 text-xs'>
-                            {item.ulasan?.[0]?.created_at
-                                ? new Date(item.ulasan[0].created_at).toLocaleDateString('id-ID')
-                                : 'Belum ada ulasan'}
-                            </p>
-
-                        </div>
-                        <div className="flex text-yellow-500 text-sm">
-                            {item.ulasan?.length > 0 && item.ulasan.map((u, j) => (
-                                <div key={j}>
-                                    <div className="flex text-yellow-500 text-sm">
-                                        {rating(u.rating).map((iconClass, i) => (
-                                            <i key={i} className={`bi ${iconClass}`}></i>
-                                        ))}
-                                    </div>
-                                    <p className='text-md text-neutral-600'>{u.komentar}</p>
-                                </div>
-                            ))}
-
-                        </div>
-                        <p className='text-md text-neutral-600'>{item.ulasan?.komentar}</p>
-                    </div>
-                ))}
-
             </div>
         </div>
         <footer className='fixed-bottom bg-white border shadow-sm w-full flex justify-center py-2'>

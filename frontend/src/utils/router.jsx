@@ -4,12 +4,8 @@ import { Home } from "../pages/public/Home"
 import Auth from "../middleware/Auth"
 import { DetailProduct } from "../pages/public/DetailProduct"
 import { Receipt } from "../pages/public/Receipt"
-import Admin from "../pages/private/Admin"
-import Peminjaman from "../pages/private/Peminjaman"
-import Form from "../pages/private/Form"
-import FormEdit from "../pages/private/FormEdit"
-import FormCreateAdmin from "../pages/private/FormTambahAdmin"
-import FormUpdateAdmin from "../pages/private/FormUpdateAdmin"
+import Admin from "../pages/private/Admin/Admin"
+import Peminjaman from "../pages/private/Peminjaman/Peminjaman"
 
 const router = createBrowserRouter([
     {
@@ -35,22 +31,6 @@ const router = createBrowserRouter([
     {
         path : '/peminjaman',
         element : <Auth auth={true}> <Peminjaman/> </Auth>
-    },
-    {
-        path : '/tambah/:record',
-        element : <Auth auth={true}> <Form/> </Auth>
-    },
-    {
-        path : '/alat/:id',
-        element : <Auth auth={true}> <FormEdit/> </Auth>
-    },
-    {
-        path : '/admin/add',
-        element : <Auth auth={true}> <FormCreateAdmin/> </Auth>
-    },
-    {
-        path : '/admin/update/:id',
-        element : <Auth auth={true}> <FormUpdateAdmin/> </Auth>
     },
 ])
 

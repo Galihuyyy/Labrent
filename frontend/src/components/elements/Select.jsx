@@ -1,9 +1,10 @@
 const Select = (props) => {
-  const { children, name, required = true, style, title} = props;
+  const { children, name, required = true, style, title, onChange} = props;
 
   return (
       <div className="relative z-0 w-full mb-5 group">
           <select
+            onChange={onChange}
               name={name}
               id={name}
               required={required}

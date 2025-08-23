@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css"
 import { RouterProvider } from 'react-router-dom'
 import router from './utils/router.jsx'
+import "./index.css"
 
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
@@ -15,6 +16,8 @@ import '@fontsource/poppins/600.css'
 import '@fontsource/poppins/700.css'
 import '@fontsource/poppins/800.css'
 import '@fontsource/poppins/900.css'
+
+import '@fontsource-variable/montserrat';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

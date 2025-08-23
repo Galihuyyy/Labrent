@@ -1,5 +1,3 @@
-import logo from '../../../src/assets/images/logo.png'
-import icon from '../../../src/assets/images/icon.png'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { getToken } from '../../utils/getToken'
@@ -64,19 +62,12 @@ const Navbar = () => {
             position='top-center'
             theme='colored'
         />
-        <div className=' fixed-top max-md:px-4 md:px-24 bg-white font-[poppins] w-full h-16 md:h-20 shadow-md border-b border-b-neutral-200 flex items-center justify-between'>
-            <div className="logo">
-                <img src={logo} className='w-24 max-sm:hidden md:w-32 h-auto' alt="" />
-                <img src={icon} className='w-10 min-sm:hidden md:w-32 h-auto' alt="" />
-
-            </div>
-
+        <div className='max-md:px-4 md:px-12 fixed top-0 right-0 bg-white font-[poppins] w-full h-16 md:h-20 shadow-md border-b border-b-neutral-200 flex items-center justify-end'>
             <ul className=" mb-0 flex items-center gap-3 md:gap-6" style={{padding:0}}>
                 <li className='relative cursor-pointer' onClick={() => {window.location.href = `${role != 'admin' ? '/transaksi-pending' : '/peminjaman'}`}}>
                     <i className="bi bi-receipt text-xl md:text-2xl"></i>
                     {role != "admin" && trxPending &&
                         <div className='absolute top-0 left-3 bg-warning text-white text-[10px] md:text-xs rounded-pill text-center px-1'><i className="bi bi-exclamation text-xs"></i></div>
-                        
                     }
                 </li>
                 <li id='profil' onMouseEnter={() => setProfileHover(true)} onMouseLeave={() => setProfileHover(false)} className='relative bg-indigo-500 w-8 h-8 md:w-10 md:h-10 rounded-full grid place-items-center font-medium text-lg md:text-2xl text-white border-2 border-indigo-600 duration-300 hover:border-indigo-900 cursor-pointer'>{users.profile.name.charAt(0)}
