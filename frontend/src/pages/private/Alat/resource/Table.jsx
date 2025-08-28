@@ -1,4 +1,4 @@
-import Loader from "../../../elements/Loader"
+import Loader from "../../../../components/elements/Loader"
 import no_data from "../../../../assets/images/no-data.png"
 
 const Table = (props) => {

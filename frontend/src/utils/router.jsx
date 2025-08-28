@@ -1,11 +1,11 @@
 import { createBrowserRouter } from "react-router-dom"
 import Login from "../pages/auth/Login"
-import { Home } from "../pages/public/Home"
 import Auth from "../middleware/Auth"
 import { DetailProduct } from "../pages/public/DetailProduct"
 import { Receipt } from "../pages/public/Receipt"
 import Admin from "../pages/private/Admin/Admin"
 import Peminjaman from "../pages/private/Peminjaman/Peminjaman"
+import { Home } from "../pages/Home"
 
 const router = createBrowserRouter([
     {

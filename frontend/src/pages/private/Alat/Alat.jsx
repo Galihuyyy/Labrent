@@ -4,14 +4,14 @@ import axios from 'axios'
 import { getToken } from '../../../utils/getToken'
 import { config } from '../../../config'
 import { toast } from 'react-toastify'
-import AdminPage from '../../Layout/AdminPage'
+import AdminPage from '../../../components/Layout/AdminPage'
 import { Add, HardwareOutlined, PlaylistAddCheck, PlaylistRemove } from '@mui/icons-material'
 import Table from './resource/Table'
-import CardHeader from '../../fragments/CardHeader'
+import CardHeader from '../../../components/fragments/CardHeader'
 import throttle from '../../../utils/Throttle'
 import ModalForm from './resource/ModalForm'
 
-function FormUpdate() {
+function Alat() {
 
   // init --------
     const { id } = useParams()
@@ -216,4 +216,4 @@ function FormUpdate() {
   )
 }
 
-export default FormUpdate
+export default Alat

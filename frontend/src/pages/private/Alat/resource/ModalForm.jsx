@@ -1,4 +1,4 @@
-import Loader from "../../../elements/Loader"
+import Loader from "../../../../components/elements/Loader"
 
 function ModalForm({ form, onChange, onClose, onSubmit, mode, loading, onDelete }) {
     const readonly = mode == "show"

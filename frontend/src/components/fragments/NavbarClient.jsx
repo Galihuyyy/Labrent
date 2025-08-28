@@ -1,32 +1,61 @@
-import React from 'react'
+import React, { useState } from 'react'
 import logo from '../../assets/images/logo.png'
 import { Search } from '@mui/icons-material'
 
 
 const NavbarClient = ({ withSearch = false }) => {
+	const [openSearch, setOpenSearch] = useState()
 	const users = JSON.parse(localStorage.getItem("user") || sessionStorage.getItem("user"))
 
+	function toggleSearch() {
+		setOpenSearch(!openSearch)
+	}
+
 	return (
-		<nav className='w-full bg-neutral-100 fixed-top flex items-center justify-content-between gap-x-6 px-12 h-18'>
-			<div className="w-full flex items-center justify-content-between border-r border-r-zinc-400 pr-6 gap-x-12">
+		<nav className="w-full bg-white fixed top-0 left-0 z-10 flex items-center justify-between px-6 md:px-12 h-16 md:h-18 shadow">
+			<div className="w-full flex items-center justify-between sm:border-r border-r-zinc-400 sm:pr-6 sm:mr-6 gap-x-12 ">
 				<div className="icon">
-					<img src={logo} alt="labrent logo" width={144} />
+					<img src={logo} alt="labrent logo" className="w-26 sm:w-46" />
 				</div>
-				<div className={`search-field flex items-center rounded outline outline-zinc-400 gap-x-2 px-2 py-1 w-full ${!withSearch ? 'opacity-0' : ''}`}>
-					<Search sx={{ fontSize: '24px' }} />
-					<input type="text" className='focus:outline-0 w-full' />
+				<div
+					className={`search-field flex items-center rounded sm:outline sm:outline-zinc-400 gap-x-2 px-2 py-1 sm:w-full ${!withSearch ? "opacity-0" : ""
+						}`}
+				>
+					<Search
+						onClick={() => {
+							toggleSearch();
+						}}
+						sx={{ fontSize: "24px" }}
+						className="sm:!hidden cursor-pointer"
+					/>
+					<div
+						className={`max-sm:bg-white max-sm:absolute duration-200 top-full ${openSearch
+								? "h-fit"
+								: "max-sm:h-0 max-sm:!py-0 max-sm:overflow-hidden"
+							} left-0 w-full max-sm:px-6 max-sm:py-3 z-0`}
+					>
+						<div className="max-sm:outline max-sm:outline-zinc-400 w-full h-fit flex items-center rounded">
+							<input
+								type="text"
+								className="focus:outline-0 rounded w-full px-3 max-sm:py-1 sm:order-2"
+							/>
+							<Search sx={{ fontSize: "24px" }} />
+						</div>
+					</div>
 				</div>
 			</div>
-			<div className="profile flex align-items-center gap-x-2">
-				<div className="profile-picture bg-indigo-800 border border-neutral-400 text-white w-8 h-8 rounded-full grid place-items-center text-lg">
+
+			<div className="profile flex items-center gap-x-2">
+				<div className="profile-picture bg-indigo-800 border border-neutral-400 text-white w-9 h-9 rounded-full grid place-items-center text-lg">
 					{users?.profile.name.charAt(0)}
 				</div>
-				<div className="detail text-sm">
-					<h6 className='m-0'>{users?.profile.name}</h6>
-					<p className='m-0 text-xs'>{users?.email}</p>
+				<div className="detail text-sm hidden md:block">
+					<h6 className="m-0">{users?.profile.name}</h6>
+					<p className="m-0 text-xs">{users?.email}</p>
 				</div>
 			</div>
 		</nav>
+
 	)
 }
 
