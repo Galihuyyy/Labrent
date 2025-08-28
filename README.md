@@ -23,10 +23,6 @@ Labrent - Sistem peminjaman barang pada laboratorium yang dapat digunakan oleh t
 - Rental Manajement [ with accept or tools return ]
 - Client Area
 
-## Quick Start
-
-Get going fast by using a static web server or GitHub Pages with this ready-to-use [Docsify Template](https://github.com/docsifyjs/docsify-template), review the [quick start tutorial](https://docsify.js.org/#/quickstart) or jump right into a CodeSandbox example site with the button below.
-
 ## Struktur Project
 
 ```bash
@@ -91,4 +87,4 @@ npm i
 ```bash
 npm run dev
 ```
-`Now, backend run in http://localhost:5173`
+`Now, frontend run in http://localhost:5173`
