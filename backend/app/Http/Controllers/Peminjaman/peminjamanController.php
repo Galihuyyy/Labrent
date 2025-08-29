@@ -30,7 +30,7 @@ class peminjamanController extends Controller
 
         $profile_id = Auth::user()->profile->id;
 
-        $peminjaman = Peminjaman::create([
+        $peminjaman = Transaksi::create([
             'alat_id' => $request->alat_id,
             'jumlah' => $request->jumlah,
             'transaksi_id' => null,
@@ -47,7 +47,7 @@ class peminjamanController extends Controller
     public function viewCart()
     {
         $profile_id = Auth::user()->id;
-        $items = Peminjaman::with('alat')
+        $items = Transaksi::with('alat')
             ->where('peminjam_id', $profile_id)
             ->whereNull('transaksi_id')
             ->get();
@@ -72,7 +72,7 @@ class peminjamanController extends Controller
         ]);
 
         foreach ($peminjaman_id as $id) {
-            Peminjaman::where('id', $id)
+            Transaksi::where('id', $id)
                 ->where('peminjam_id', $user_id)
                 ->update(['transaksi_id' => $transaksi->id]);
         }
@@ -123,31 +123,6 @@ class peminjamanController extends Controller
     }
 
     // 6. Tambah ulasan setelah pengembalian
-    public function tambahUlasan(Request $request)
-    {
-        $request->validate([
-            'peminjaman_id' => 'required|exists:peminjaman,id',
-            'rating' => 'required|integer|min:1|max:5',
-            'komentar' => 'nullable|string'
-        ]);
-
-        $peminjaman = Peminjaman::find($request->peminjaman_id);
-
-        if ($peminjaman->transaksi->status !== 'dikembalikan') {
-            return response()->json(['message' => 'Belum bisa ulasan sebelum pengembalian'], 403);
-        }
-
-        $ulasan = Ulasan::create([
-            'peminjaman_id' => $request->peminjaman_id,
-            'rating' => $request->rating,
-            'komentar' => $request->komentar,
-        ]);
-
-        return response()->json([
-            'message' => 'Ulasan berhasil ditambahkan',
-            'data' => $ulasan
-        ], 201);
-    }
 
     public function transaksiPending(string $id)
     {

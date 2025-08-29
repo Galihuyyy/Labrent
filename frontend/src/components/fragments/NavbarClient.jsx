@@ -1,15 +1,19 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import logo from '../../assets/images/logo.png'
 import { Search } from '@mui/icons-material'
+import useAlat from '../../hooks/HookAlat'
 
 
-const NavbarClient = ({ withSearch = false }) => {
-	const [openSearch, setOpenSearch] = useState()
+const NavbarClient = ({ withSearch = false, onInputSearch, onClickSearch }) => {
+	const [openSearch, setOpenSearch] = useState(false)
+	const inputSearchRef = useRef(null)
 	const users = JSON.parse(localStorage.getItem("user") || sessionStorage.getItem("user"))
 
-	function toggleSearch() {
-		setOpenSearch(!openSearch)
-	}
+	useEffect(() => {
+		if (openSearch && inputSearchRef.current) {
+			inputSearchRef.current.focus();
+		}
+	}, [openSearch]);
 
 	return (
 		<nav className="w-full bg-white fixed top-0 left-0 z-10 flex items-center justify-between px-6 md:px-12 h-16 md:h-18 shadow">
@@ -22,9 +26,7 @@ const NavbarClient = ({ withSearch = false }) => {
 						}`}
 				>
 					<Search
-						onClick={() => {
-							toggleSearch();
-						}}
+						onClick={() => { setOpenSearch(!openSearch) }}
 						sx={{ fontSize: "24px" }}
 						className="sm:!hidden cursor-pointer"
 					/>
@@ -34,12 +36,23 @@ const NavbarClient = ({ withSearch = false }) => {
 								: "max-sm:h-0 max-sm:!py-0 max-sm:overflow-hidden"
 							} left-0 w-full max-sm:px-6 max-sm:py-3 z-0`}
 					>
-						<div className="max-sm:outline max-sm:outline-zinc-400 w-full h-fit flex items-center rounded">
+						<div className="max-sm:outline max-sm:outline-zinc-400 w-full h-fit flex items-center rounded pr-2">
 							<input
+								ref={inputSearchRef}
+								id='search'
+								onChange={(e) => {onInputSearch(e.target.value)}}
+								onKeyDown={(e) => {
+									if (e.key === "Enter") {
+										setOpenSearch(false)
+										inputSearchRef.current.blur()
+										onClickSearch();
+									}
+								}}
 								type="text"
 								className="focus:outline-0 rounded w-full px-3 max-sm:py-1 sm:order-2"
 							/>
-							<Search sx={{ fontSize: "24px" }} />
+							<Search sx={{ fontSize: "24px" }} onClick={() => {onClickSearch()}} />
+							<button type='button' className='hidden sm:block sm:order-3' onClick={() => {onClickSearch()}}>cari</button>
 						</div>
 					</div>
 				</div>

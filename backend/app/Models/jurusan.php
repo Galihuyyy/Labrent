@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class jurusan extends Model
+class Jurusan extends Model
 {
-    protected $table = "jurusan";
+    protected $table = "ms_jurusan";
 
     public function profile () {
-        return $this->hasMany(profile::class, 'jurusan_id');
+        return $this->hasMany(Profile::class, 'jurusan_id');
     }
 }

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class profile extends Model
 {
-    protected $table = "profile",
+    protected $table = "tr_profile",
     $hidden = ['id', 'user_id', 'kelas_id', 'jurusan_id'];
     protected $guarded = [];
 
@@ -15,14 +15,14 @@ class profile extends Model
     }
     
     public function kelas () {
-        return $this->belongsTo(kelas::class, 'kelas_id', 'id');
+        return $this->belongsTo(Kelas::class, 'kelas_id', 'id');
     }
 
     public function jurusan () {
-        return $this->belongsTo(jurusan::class, 'jurusan_id', 'id');
+        return $this->belongsTo(Jurusan::class, 'jurusan_id', 'id');
     }
 
     public function transaksi () {
-        return $this->hasMany(transaksi::class, 'peminjam_id');
+        return $this->hasMany(Transaksi::class, 'peminjam_id');
     }
 }

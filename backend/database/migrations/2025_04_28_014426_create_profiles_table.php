@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('profile', function (Blueprint $table) {
+        Schema::create('tr_profile', function (Blueprint $table) {
             $table->id();
             $table->foreignId("user_id")->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->string('name');
-            $table->foreignId("kelas_id")->nullable()->constrained()->onDelete('cascade')->onUpdate('cascade');
-            $table->foreignId("jurusan_id")->nullable()->constrained("jurusan")->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId("kelas_id")->nullable()->constrained('ms_kelas')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId("jurusan_id")->nullable()->constrained("ms_jurusan")->onDelete('cascade')->onUpdate('cascade');
             $table->enum('gender', ['pria', 'wanita']);
             $table->string('no_telp');
             $table->timestamps();
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('profiles');
+        Schema::dropIfExists('tr_profile');
     }
 };

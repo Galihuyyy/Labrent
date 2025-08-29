@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tr_alat', function (Blueprint $table) {
+        Schema::create('tr_keranjang', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->text('deskripsi');
-            $table->integer('stok');
-            $table->string('keterangan');
-            $table->timestamps();
+            $table->foreignId('peminjam_id')->constrained('users')->cascadeOnDelete();
         });
     }
 
@@ -26,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tr_alat');
+        Schema::dropIfExists('tr_keranjang');
     }
 };

@@ -6,12 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class transaksi extends Model
 {
-    protected $table = "transaksi", $guarded = [];
+    protected $table = "tr_transaksi", $guarded = [];
     public $timestamps = false;
 
     public function transaksi_details()
     {
-        return $this->hasOne(transaksiDetails::class, 'transaksi_id', 'id');
+        return $this->hasOne(TransaksiDetails::class, 'transaksi_id', 'id');
     }
 
     public function peminjam()

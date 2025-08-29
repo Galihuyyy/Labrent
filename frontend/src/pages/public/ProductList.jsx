@@ -1,49 +1,31 @@
-import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import { getToken } from '../../utils/getToken'
-import { config } from '../../config'
 import banner from '../../assets/images/banner-client.png'
 import NavbarClient from '../../components/fragments/NavbarClient'
+import useAlat from '../../hooks/HookAlat'
+import WithLoading from '../../components/Layout/WithLoading'
 
 export const ProductList = () => {
+  const { loading, alatTersedia, alatTidakTersedia, getDataAlat } = useAlat()
 
-  const token = getToken()
-  const apiUrl = config.API_URL
-  const [dataAlatTersedia, setDataAlatTersedia] = useState([])
-  const [dataAlatTidakTersedia, setDataAlatTidakTersedia] = useState([])
-
-
-  const getDataAlat = () => {
-    axios.get(`${apiUrl}/home/alat`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-      .then(res => {
-        setDataAlatTersedia(res.data.data.alat_tersedia);
-        setDataAlatTidakTersedia(res.data.data.alat_tidak_tersedia);
-
-
-      })
-      .catch(err => {
-        console.log(err.response.data);
-
-      })
-  }
-
+	const [searchValue, setSearchValue] = useState("")
+  
+	function handleSearch () {
+		getDataAlat(searchValue)
+	}
 
   useEffect(() => {
-    getDataAlat()
-  }, [])
-
+    if (searchValue === '' || !searchValue ){
+      getDataAlat()
+    }
+  }, [searchValue])
 
   return (
     <div className="w-full py-14 lg:py-20 mx-auto text-neutral-800 relative px-6 md:px-12">
-      <NavbarClient withSearch="true"></NavbarClient>
+      <NavbarClient withSearch="true" onInputSearch={(value) => {setSearchValue(value)}} onClickSearch={() => {handleSearch()}}></NavbarClient>
 
       <div className="w-full mx-auto mt-6 mb-12 max-lg:mb-6">
         <div className="relative w-full overflow-hidden rounded-xl shadow-lg aspect-[10/4]">
-          <img
+          <img  
             src={banner}
             alt="Banner Ecommerce"
             className="w-full h-full object-cover object-center"
@@ -55,48 +37,50 @@ export const ProductList = () => {
       <main className='grid grid-cols-1 md:grid-cols-[1fr_.5fr] gap-6'>
         <div className="right-side">
           <h5 className='text-start !text-blue-900 relative max-w-fit !mb-6 h-fit !text-sm md:!text-md lg:!text-lg'>Alat Tersedia <span className='absolute -bottom-2 left-0 md:left-1/2 md:translate-middle-x w-50 h-1 rounded bg-blue-800'></span></h5>
-          <div className="product-card grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
-            {dataAlatTersedia.map((alat, i) => (
-              <div key={i} onClick={() => { window.location.href = `/detail/${alat.id}` }} className="bg-white h-fit min-h-48 rounded shadow-sm border-neutral-200 border-[1px] duration-100 hover:border-indigo-500 cursor-pointer align-middle flex flex-col w-full">
-                <div className='w-full h-30 mb-1 overflow-hidden rounded flex items-center justify-center'>
-                  <img src={alat.foto_alat} width={120} className='w-full object-cover' />
-                </div>
-                <div className="px-2 flex flex-col h-full">
-                  <p className="mb-2 text-xs sm:text-sm line-clamp-2 text-zinc-700">
-                    {alat.name} sjdbshjvdksjhvdhbdhjbsabsasb hj
-                  </p>
-                  <p className="text-zinc-500 font-medium text-[11px] sm:text-xs text-end mt-auto">
-                    {alat.stok} Tersedia
-                  </p>
-                </div>
-
-              </div>
-            ))}
-            {dataAlatTidakTersedia.length > 0 &&
-              <>
-                <h5 className='text-center col-span-2 md:col-span-4'>Alat Tidak Tersedia</h5>
-                {dataAlatTidakTersedia.map((alat, i) => (
-                  <div key={i} className="relative bg-white rounded shadow-sm border-neutral-200 border-[1px] duration-100 hover:border-indigo-500 cursor-pointer align-middle flex flex-col w-full sm:px-4 max-sm:px-2 py-3">
-                    <div className='w-full h-30 mb-3 overflow-hidden flex items-center justify-center'>
-                      <img src={alat.foto_alat[0].foto} width={120} className=' object-contain' />
-                    </div>
-                    <p className='mb-0 text-lg line-clamp-2 text-neutral-600'>{alat.name}</p>
-                    <div>
-                      {[1, 2, 3, 4, 5].map(i => (
-                        <i key={i} className="bi bi-star-fill text-yellow-400 text-xs md:text-sm"></i>
-
-                      ))}
-                    </div>
-                    <p className='text-neutral-600 font-medium text-xs flex-1 text-end mb-0 mt-2'>{alat.stok} Tersedia</p>
-
-                    <div className="absolute top-0 left-0 w-full h-full opacity-50 rounded bg-black">
-
-                    </div>
+          <WithLoading loading={loading}>
+            <div className="product-card grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4 min-h-24">
+              {alatTersedia.map((alat, i) => (
+                <div key={i} onClick={() => { window.location.href = `/detail/${alat.id}` }} className="bg-white h-fit min-h-48 rounded shadow-sm border-neutral-200 border-[1px] duration-100 hover:border-indigo-500 cursor-pointer align-middle flex flex-col w-full">
+                  <div className='w-full h-30 mb-1 overflow-hidden rounded flex items-center justify-center'>
+                    <img src={alat.foto_alat} width={120} className='w-full object-cover' />
                   </div>
-                ))}
-              </>
-            }
-          </div>
+                  <div className="px-2 flex flex-col h-full">
+                    <p className="mb-2 text-xs sm:text-sm line-clamp-2 text-zinc-700">
+                      {alat.name}
+                    </p>
+                    <p className="text-zinc-500 font-medium text-[11px] sm:text-xs text-end mt-auto">
+                      {alat.stok} Tersedia
+                    </p>
+                  </div>
+
+                </div>
+              ))}
+              {alatTidakTersedia.length > 0 &&
+                <>
+                  <h5 className='text-center col-span-2 md:col-span-4'>Alat Tidak Tersedia</h5>
+                  {dataAlatTidakTersedia.map((alat, i) => (
+                    <div key={i} className="relative bg-white rounded shadow-sm border-neutral-200 border-[1px] duration-100 hover:border-indigo-500 cursor-pointer align-middle flex flex-col w-full sm:px-4 max-sm:px-2 py-3">
+                      <div className='w-full h-30 mb-3 overflow-hidden flex items-center justify-center'>
+                        <img src={alat.foto_alat[0].foto} width={120} className=' object-contain' />
+                      </div>
+                      <p className='mb-0 text-lg line-clamp-2 text-neutral-600'>{alat.name}</p>
+                      <div>
+                        {[1, 2, 3, 4, 5].map(i => (
+                          <i key={i} className="bi bi-star-fill text-yellow-400 text-xs md:text-sm"></i>
+
+                        ))}
+                      </div>
+                      <p className='text-neutral-600 font-medium text-xs flex-1 text-end mb-0 mt-2'>{alat.stok} Tersedia</p>
+
+                      <div className="absolute top-0 left-0 w-full h-full opacity-50 rounded bg-black">
+
+                      </div>
+                    </div>
+                  ))}
+                </>
+              }
+            </div>
+          </WithLoading>
 
         </div>
         <div className="border rounded shadow-sm p-4 right-12 w-full bg-white">

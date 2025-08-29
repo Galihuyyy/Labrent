@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('foto_alat', function (Blueprint $table) {
+        Schema::create('tr_foto_alat', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("alat_id")->references('id')->on('alat')->constrained()->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId("alat_id")->references('id')->on('tr_alat')->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->string('foto');
             $table->timestamps();
         });
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('foto_alats');
+        Schema::dropIfExists('tr_foto_alat');
     }
 };

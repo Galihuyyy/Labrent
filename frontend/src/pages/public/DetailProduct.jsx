@@ -4,20 +4,22 @@ import Navbar from '../../components/fragments/Navbar'
 import { config } from '../../config'
 import axios from 'axios'
 import { getToken } from '../../utils/getToken'
-import Carousel from '../../components/Layout/Carousel'
 import { toast, ToastContainer } from 'react-toastify'
 import NavbarClient from '../../components/fragments/NavbarClient'
+import useAlat from '../../hooks/HookAlat'
+import WithLoading from '../../components/Layout/WithLoading'
 
 export const DetailProduct = () => {
-    const {id} = useParams()
+    const { id } = useParams()
     const apiUrl = config.API_URL
     const token = getToken()
 
-    const [dataAlat, setDataAlat] = useState([])
+    const { loading, detailAlat, getDetailAlat } = useAlat();
     const [alatImages, setAlatImages] = useState([])
+
     const [peminjaman, setPeminjaman] = useState([{
-        peminjam : {
-            profile : {}
+        peminjam: {
+            profile: {}
         },
         ulasan: [
             {
@@ -28,157 +30,152 @@ export const DetailProduct = () => {
         ]
     }])
 
-    const [dataCart, setDataCart] = useState({
-        'alat_id' : id,
-        'jumlah' : 1
-    })
-
-    
-
-    const getDetailAlat = () => {
-        axios.get(`${apiUrl}/home/alat/${id}`, {
-            headers : {
-                Authorization : `Bearer ${token}`
-            } 
-        })
-        .then(res => {
-            console.log(res.data.data)
-            setDataAlat(res.data.data)
-        })
-        .catch(err => {
-            console.log(err.response.data)
-        })
-    }
-
     const addCart = () => {
         const toastAddKeranjangId = toast.loading("Menambahkan ke keranjang...");
 
-        axios.post(`${apiUrl}/peminjaman`, dataCart , {
-            headers : {
-                Authorization : `Bearer ${token}`
+        axios.post(`${apiUrl}/peminjaman`, {/* data */}, {
+            headers: {
+                Authorization: `Bearer ${token}`
             }
         })
-        .then (res => {
-            console.log(res.data);
-            toast.update(toastAddKeranjangId, {
-                type : 'success',
-                render : res.data?.message || 'Berhasil ditambahkan ke keranjang!',
-                isLoading : false,
-                hideProgressBar : false,
-                autoClose : true,
-                closeButton : true
+            .then(res => {
+                console.log(res.data);
+                toast.update(toastAddKeranjangId, {
+                    type: 'success',
+                    render: res.data?.message || 'Berhasil ditambahkan ke keranjang!',
+                    isLoading: false,
+                    hideProgressBar: false,
+                    autoClose: true,
+                    closeButton: true
+                })
             })
-        })
-        .catch(err => {
-            console.log(err);
-        })
+            .catch(err => {
+                console.log(err);
+            })
     }
 
     const pinjamLangsung = () => {
         const toastPinjamLangsungId = toast.loading("Meminjam...");
-        axios.post(`${apiUrl}/peminjaman/transaksi/add`, dataCart , {
-            headers : {
-                Authorization : `Bearer ${token}`
+        axios.post(`${apiUrl}/peminjaman/transaksi/add`, {/* Data */}, {
+            headers: {
+                Authorization: `Bearer ${token}`
             }
         })
-        .then (res => {
-            console.log(res.data);
-            toast.update(toastPinjamLangsungId, {
-                type : 'success',
-                render : res.data?.message || 'Berhasil melakukan peminjaman!',
-                isLoading : false,
-                hideProgressBar : false,
-                autoClose : true,
-                closeButton : true
-            })
+            .then(res => {
+                console.log(res.data);
+                toast.update(toastPinjamLangsungId, {
+                    type: 'success',
+                    render: res.data?.message || 'Berhasil melakukan peminjaman!',
+                    isLoading: false,
+                    hideProgressBar: false,
+                    autoClose: true,
+                    closeButton: true
+                })
 
-            setTimeout(function() {
-                window.location.href = '/transaksi-pending'
-            }, 1000);
-        })
-        .catch(err => {
-            console.log(err);
-        })
+                setTimeout(function () {
+                    window.location.href = '/transaksi-pending'
+                }, 1000);
+            })
+            .catch(err => {
+                console.log(err);
+            })
     }
 
 
     useEffect(() => {
-        getDetailAlat()
+        getDetailAlat(id)
     }, [])
-    
-  return (
-    <div className='pb-20'>
-        <NavbarClient withSearch={false}></NavbarClient>
-        <div className="w-11/12 sm:w-9/12 pt-28 mx-auto font-[poppins] text-neutral-800 pb-20">
-            <ToastContainer
-                position='top-center'
-                theme='colored'
-            />
-            <div className="flex items-center gap-x-3 cursor-pointer" onClick={() => {window.location.href = "/"}}>
-                <i className="bi bi-arrow-left text-2xl mb-3"></i>
-                <p className='text-xl'>Kembali</p>
-            </div>
-            <div className="rounded w-full shadow-sm border py-12 max-sm:py-2 px-2 sm:px-12 grid grid-cols-1 sm:grid-cols-2">
-                <div className="max-w-md rounded border py-4 bg-neutral-400">
-                        <img className='w-full object-contain' src={dataAlat.foto_alat} />
-                    {/* <Carousel>
-                    </Carousel> */}
-                </div>
-                <div>
-                    <h2>{dataAlat.name}</h2>
-                    <div className="flex mb-3">
-                        {[1,2,3,4,5].map(i => (
-                            <i key={i} className="bi bi-star-fill text-yellow-400 text-xs md:text-sm"></i>
 
-                        ))}
+    return (
+        <div className=''>
+            <NavbarClient withSearch={false}></NavbarClient>
+            <div className="w-11/12 sm:w-9/12 py-24 mx-auto font-[poppins] text-neutral-800">
+                <ToastContainer
+                    position='top-center'
+                    theme='colored'
+                />
+                <div className="flex items-center text-gray-600 text-sm mb-3">
+                    <span className="cursor-pointer hover:text-indigo-500 transition" onClick={() => { window.location.href = "/" }} >
+                        Home
+                    </span>
+                    <span className="mx-2">{'>'}</span>
+                    <span className="text-gray-400">{detailAlat.name}</span>
+                </div>
+
+                <WithLoading loading={loading}>
+                    <div className="rounded-sm w-full shadow-sm border p-3 sm:px-12 grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-x-12">
+                        <div className="max-w-sm py-4 bg-neutral-200">
+                            <img className='w-full object-cover' src={detailAlat.foto_alat} />
+                        </div>
+                        <div className='flex flex-column py-3'>
+                            <h3>{detailAlat.name}</h3>
+                            <div className="deskripsi">
+                                <label htmlFor="deskripsi" className='text-black/75 font-medium text-sm'>Deskripsi</label>
+                                <p id='deskripsi' className='text-black/50 text-sm'>{detailAlat.deskripsi ?? 'No Description'}</p>
+                            </div>
+                            <Counter max={detailAlat.stok}></Counter>
+                            <span className="inline-flex w-fit items-center px-3 py-0.5 cursor-default rounded-full text-[12px]  bg-orange-100 text-orange-700 mt-3">
+                                <i className="bi bi-info-circle-fill mr-1 text-[14px]"></i>
+                                terpinjam {peminjaman.length} kali
+                            </span>
+                            <div className="sm:flex items-center gap-x-3 hidden">
+                                <button className='max-w-fit mt-3 py-2 px-3 !rounded-sm text-indigo-600 !text-sm bg-indigo-100 outline outline-indigo-600 hover:bg-indigo-50 duration-200' onClick={() => { pinjamLangsung() }}>Masukkan Keranjang</button>
+                                <button className='max-w-fit mt-3 py-2 px-3 !rounded-sm text-white !text-sm bg-indigo-600 hover:bg-indigo-500 duration-200' onClick={() => { pinjamLangsung() }}>Pinjam Sekarang</button>
+                            </div>
+                        </div>
+
                     </div>
-                    <p>{dataAlat.deskripsi}</p>
-                    <div className="w-fit flex items-center border-[1px] border-neutral-700">
-                    <button 
-                        className='bg-neutral-500 text-neutral-200 px-1'
-                        onClick={() => {
-                            setDataCart(prev => ({
-                                ...prev,
-                                jumlah: Math.max(1, Number(prev.jumlah) - 1) 
-                            }))
-                        }}
-                    >
-                        <i className="bi bi-dash text-xl"></i>
-                    </button>
-                    
-                    <input 
-                        type="number"
-                        className='w-10 h-full text-center'
-                        value={dataCart.jumlah}
-                        onChange={(e) => {
-                            const val = Number(e.target.value);
-                            setDataCart({...dataCart, jumlah: Math.min(dataAlat.stok, val)})
-                        }}
-                    />
-                    
-                    <button 
-                        className='bg-neutral-500 text-neutral-200 px-1'
-                        onClick={() => {
-                            setDataCart(prev => ({
-                                ...prev,
-                                jumlah: Math.min(dataAlat.stok,Number(prev.jumlah) + 1)
-                            }))
-                        }}
-                    >
-                        <i className="bi bi-plus text-xl"></i>
-                    </button>
-                </div>
-                    <p className='mt-3'>terpinjam {peminjaman.length} kali</p>
-
-                </div>
-                
+                </WithLoading>
             </div>
+            <footer className='fixed-bottom bg-white border shadow-sm w-full flex justify-center py-2 sm:hidden'>
+                <div className="flex items-center justify-end w-11/12 sm:w-9/12  gap-x-2">
+                    <button className='max-w-fit py-2 px-3 !rounded-sm text-indigo-600 !text-sm bg-indigo-100 outline outline-indigo-600 hover:bg-indigo-50 duration-200' onClick={() => { pinjamLangsung() }}>Masukkan Keranjang</button>
+                    <button className='max-w-fit py-2 px-3 !rounded-sm text-white !text-sm bg-indigo-600 hover:bg-indigo-500 duration-200' onClick={() => { pinjamLangsung() }}>Pinjam Sekarang</button>
+                </div>
+            </footer>
         </div>
-        <footer className='fixed-bottom bg-white border shadow-sm w-full flex justify-center py-2'>
-            <div className="flex items-center justify-end w-11/12 sm:w-9/12  gap-x-2">
-                <button className='py-2 px-3 rounded text-neutral-200 font-semibold bg-indigo-600' onClick={() => {pinjamLangsung()}}>Pinjam Sekarang</button>
-            </div>
-        </footer>
+    )
+}
+
+export const Counter = ({ max = 10 }) => {
+  const [count, setCount] = useState(1)
+
+  const handleDecrease = () => {
+    setCount(prev => Math.max(1, prev - 1))
+  }
+
+  const handleIncrease = () => {
+    setCount(prev => Math.min(max, prev + 1))
+  }
+
+  const handleChange = (e) => {
+    const val = Number(e.target.value)
+    if (!isNaN(val)) {
+      setCount(Math.min(max, Math.max(1, val)))
+    }
+  }
+
+  return (
+    <div className="w-fit h-max flex items-center border border-neutral-200 rounded overflow-hidden">
+      <button onClick={handleDecrease}
+        className="bg-neutral-100 text-neutral-400 px-2 h-full"
+      >
+        <i className="bi bi-dash text-xl"></i>
+      </button>
+
+      <input type="number" value={count} onChange={handleChange}
+        className="w-12 h-full text-center !text-sm 
+                  [appearance:textfield] 
+                  [&::-webkit-outer-spin-button]:appearance-none 
+                  [&::-webkit-inner-spin-button]:appearance-none"
+      />
+
+      <button onClick={handleIncrease}
+        className="bg-neutral-100 text-neutral-400 px-2 h-full"
+      >
+        <i className="bi bi-plus text-xl"></i>
+      </button>
     </div>
   )
 }
+
