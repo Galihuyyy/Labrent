@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\alatController;
 use App\Http\Controllers\Admin\siswaController;
 use App\Http\Controllers\Peminjaman\peminjamanController;
 use App\Http\Controllers\Auth\authController;
+use App\Http\Controllers\Keranjang\KeranjangController;
 use App\Http\Middleware\role;
 use App\Models\transaksi;
 use App\Models\User;
@@ -44,10 +45,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/home/alat', [alatController::class, 'index']);
     Route::get('/home/alat/{id}', [alatController::class, 'show']);
 
-    Route::post('/peminjaman/transaksi/add', [peminjamanController::class, 'pinjamLangsung']);
-    Route::post('/peminjaman', [peminjamanController::class, 'addToCart']);
-    Route::get('/peminjaman', [peminjamanController::class, 'viewCart']);
+    Route::apiResource('/keranjang', KeranjangController::class);
     Route::post('/checkout', [peminjamanController::class, 'checkout']);
+    
+    Route::post('/peminjaman/transaksi/add', [peminjamanController::class, 'pinjamLangsung']);
     
     Route::post('/ulasan', [peminjamanController::class, 'tambahUlasan']);
     Route::get('/transaksi', [peminjamanController::class, 'riwayatTransaksi']);

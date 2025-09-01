@@ -50,7 +50,7 @@ class User extends Authenticatable
      }
 
      public function keranjang() {
-         return $this->hasMany(Keranjang::class);
+         return $this->hasMany(Keranjang::class, 'peminjam_id', 'id');
      }
      
     protected function casts(): array

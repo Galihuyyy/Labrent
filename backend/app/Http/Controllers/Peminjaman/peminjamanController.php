@@ -24,7 +24,7 @@ class peminjamanController extends Controller
     public function addToCart(Request $request)
     {
         $request->validate([
-            'alat_id' => 'required|exists:alat,id',
+            'alat_id' => 'required|exists:tr_alat,id',
             'jumlah' => 'required|integer|min:1'
         ]);
 
@@ -166,7 +166,7 @@ class peminjamanController extends Controller
     {
 
         $request->validate([
-            'alat_id' => 'required|exists:alat,id',
+            'alat_id' => 'required|exists:tr_alat,id',
             'jumlah' => 'required|integer|min:1'
         ]);
 

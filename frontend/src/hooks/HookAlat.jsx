@@ -39,21 +39,17 @@ export default function useAlat() {
   }, [])
 
   // 🔹detail alat
-  function getDetailAlat(id) {
+  async function getDetailAlat(id) {
     setLoading(true)
-    axios.get(`${apiUrl}/home/alat/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    .then((res) => {
+    try {
+      const res = await axios.get(`${apiUrl}/home/alat/${id}`, { headers: { Authorization: `Bearer ${token}` }})
       setDetailAlat(res.data.data)
-    })
-    .catch((err) => {
+    } catch (error) {
       toast.error('Gagal mengambil detail alat!')
       console.error(err)
-    })
-    .finally(() => {
+    } finally {
       setLoading(false)
-    })
+    }
   }
 
   return {
