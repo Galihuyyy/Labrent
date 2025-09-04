@@ -141,7 +141,7 @@ export const DetailProduct = () => {
     )
 }
 
-export const Counter = ({ max = 10, count, setCount }) => {
+export const Counter = ({ max = 10, count, setCount, className = "" }) => {
   const handleDecrease = () => {
     setCount(prev => Math.max(1, prev - 1))
   }
@@ -158,7 +158,7 @@ export const Counter = ({ max = 10, count, setCount }) => {
   }
 
   return (
-    <div className="w-fit h-max flex items-center border border-neutral-200 rounded overflow-hidden sm:ms-6 my-2">
+    <div className={`w-fit h-max flex items-center border border-neutral-200 rounded overflow-hidden sm:ms-6 my-2 ${className}`}>
       <button onClick={handleDecrease}
         className="bg-neutral-100 text-neutral-400 px-2 h-full"
       >

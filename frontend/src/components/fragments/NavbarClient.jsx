@@ -3,6 +3,9 @@ import logo from '../../assets/images/logo.png'
 import { ChevronRightOutlined, Receipt, Search, ShoppingBasketOutlined, ShoppingCart, ShoppingCartOutlined } from '@mui/icons-material'
 import CardActions from '@mui/material/CardActions'
 import Badge from '../elements/Badge'
+import { useKeranjang } from '../../pages/public/Keranjang'
+import { config } from '../../config'
+import { getToken } from '../../utils/getToken'
 
 
 const NavbarClient = ({ withSearch = false, onInputSearch, onClickSearch }) => {
@@ -11,6 +14,9 @@ const NavbarClient = ({ withSearch = false, onInputSearch, onClickSearch }) => {
 	const [profileClick, setProfileClick] = useState(false)
 	const inputSearchRef = useRef(null)
 	const profileRef = useRef(null)
+	const toggleProfileRef = useRef(null)
+
+	const { keranjang } = useKeranjang(config.API_URL, getToken())
 
 	useEffect(() => {
 		if (openSearch && inputSearchRef.current) {
@@ -20,11 +26,13 @@ const NavbarClient = ({ withSearch = false, onInputSearch, onClickSearch }) => {
 
 	useEffect(() => {
 		function handleClickOutside(e) {
-			if (profileRef.current && !profileRef.current.contains(e.target)) {
+			if (profileRef.current && !profileRef.current.contains(e.target) && toggleProfileRef.current && !toggleProfileRef.current.contains(e.target)) {
 				setProfileClick(false)
 			}
 		}
+
 		if (profileClick) {
+			console.log("open");
 			document.addEventListener("mousedown", handleClickOutside);
 			document.addEventListener("scroll", handleClickOutside);
 		}
@@ -79,18 +87,18 @@ const NavbarClient = ({ withSearch = false, onInputSearch, onClickSearch }) => {
 				</div>
 			</div>
 
-			<div className="flex items-center cursor-pointer relative" onClick={() => { setProfileClick(!profileClick) }}>
+			<div className="flex items-center cursor-pointer relative" onClick={() => { setProfileClick(!profileClick) }} ref={toggleProfileRef}>
 				<Profile abjad={users?.profile.name} />
 				<ChevronRightOutlined className='text-black/75 rotate-90' />
 
-				<div ref={profileRef} className={`bg-white rounded-sm border border-black/50 absolute duration-200 ${profileClick ? 'top-[130%] opacity-100' : 'top-[100%] opacity-0'} right-0 w-52 sm:w-60 shadow-sm`}>
+				<div ref={profileRef} className={`bg-white rounded-sm border border-black/50 absolute duration-200 ${profileClick ? 'top-[130%] opacity-100 pointer-events-auto' : 'top-[100%] opacity-0 pointer-events-none'} right-0 w-52 sm:w-60 shadow-sm`}>
 					<div className="header p-3 border-b border-b-black/50 flex flex-column items-center">
 						<Profile abjad={users?.profile.name} />
 						<p className='m-0 text-sm font-medium'>{users?.profile.name}</p>
 						<p className='m-0 text-xs'>{users?.email}</p>
 					</div>
 					<div className="body flex items-start flex-column">
-						<a className='text-sm !no-underline !text-black/75 hover:bg-neutral-100 w-full px-3 py-2.5'><ShoppingCartOutlined sx={{ fontSize:'22px' }}/> <span className="ml-2">Keranjang Saya</span> <Badge variant={'secondary'} className={'!px-2 !text-[10px] sm:!px-3 '} >16</Badge></a>
+						<a href='/keranjang' className='text-sm !no-underline !text-black/75 hover:bg-neutral-100 w-full px-3 py-2.5'><ShoppingCartOutlined sx={{ fontSize:'22px' }}/> <span className="ml-2">Keranjang Saya</span> <Badge variant={'secondary'} className={'!px-2 !text-[10px] sm:!px-3 '} >{keranjang?.length || '-'}</Badge></a>
 						<a className='text-sm !no-underline !text-black/75 hover:bg-neutral-100 w-full px-3 py-2.5'><Receipt sx={{ fontSize:'22px' }}/> <span className="ml-2">Peminjaman Saya</span></a>
 					</div>
 				</div>

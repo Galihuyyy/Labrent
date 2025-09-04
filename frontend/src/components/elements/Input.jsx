@@ -1,6 +1,6 @@
 
 const Input = (props) => {
-    const {children, type = "text", name, style, onChange, value} = props
+    const {children, type = "text", name, style, onChange, value, className = "", disabled = false} = props
 
     return (
         <div className={`relative z-0 w-full group ${style}`}>
@@ -12,7 +12,8 @@ const Input = (props) => {
             onChange={onChange}
             placeholder=" "
             required
-            className={`block py-2.5 ps-4 text-2xl w-full text-gray-900 bg-transparent border-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-indigo-300 peer rounded-pill`}
+            disabled={disabled}
+            className={`block py-2.5 ps-4 text-2xl w-full text-gray-900 bg-transparent border-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-indigo-300 peer rounded-pill ${className}`}
             />
             <label
             htmlFor={name}

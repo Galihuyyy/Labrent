@@ -17,7 +17,18 @@ class KeranjangController extends Controller
         try {
             return response()->json([
                 'message' => 'Berhasil mendapatkan data keranjang',
-                'data' => $user->keranjang()->with(['peminjam', 'alat'])->get()
+                'data' => $user->keranjang()->with(['peminjam', 'alat.foto_alat'])->get()->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'qty' => $item->qty,
+                        'alat_id' => $item->alat?->id,
+                        'alat_name' => $item->alat?->name,
+                        'alat_deskripsi' => $item->alat?->deskripsi,
+                        'alat_stok' => $item->alat?->stok,
+                        'alat_keterangan' => $item->alat?->keterangan,
+                        'alat_foto' => asset('storage/' . $item->alat?->foto_alat?->foto ?? '')
+                    ];
+                })
             ]);
         } catch (\Throwable $th) {
             return response()->json([
@@ -68,7 +79,18 @@ class KeranjangController extends Controller
     public function show(Keranjang $keranjang)
     {
         try {
-            return $keranjang;
+            $keranjang->load('alat.foto_alat', 'peminjam');
+            
+            return response()->json([
+                'message' => "detail keranjang didapatkan",
+                "data" => [
+                    'id' => $keranjang->id,
+                    'qty' => $keranjang->qty,
+                    'alat_name' => $keranjang->alat?->name,
+                    'alat_deskripsi' => $keranjang->alat?->deskripsi,
+                    'alat_foto' => asset('storage/' . $keranjang->alat?->foto_alat?->foto)
+                ]
+            ]);
         } catch (\Throwable $th) {
             return response()->json([
                 'message' => 'Gagal mendapatkan detail keranjang',
@@ -81,18 +103,41 @@ class KeranjangController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Keranjang $keranjang)
+    public function destroy(Request $request)
     {
+        $ids = $request->input('ids', []); // default [] kalau null
+
         try {
-            $keranjang->delete();
+            Keranjang::whereIn('id', $ids)->delete();
+
             return response()->json([
-                'message' => "Keranjang berhasil di delete",
+                'message' => "Keranjang berhasil dihapus",
             ]);
         } catch (\Throwable $th) {
             return response()->json([
-                'message' => "Keranjang gagal di delete",
+                'message' => "Keranjang gagal dihapus",
                 'error' => $th->getMessage()
             ], 500);
         }
+    }
+
+
+    public function updateQty(Request $request) {
+        $idKeranjang = $request->input('id');
+        $newQty = $request->input('qty');
+
+        try {
+            $keranjang = Keranjang::findOrFail($idKeranjang);
+            $keranjang->qty = $newQty;
+            $keranjang->save();
+    
+            return response()->json([
+                'message' => "qty berhasil ditambahkan!",
+                "keranjang" => $keranjang
+            ]);
+        } catch (\Throwable $th) {
+            abort($th->getCode(), $th->getMessage());
+        }
+
     }
 }

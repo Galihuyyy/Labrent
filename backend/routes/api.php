@@ -46,6 +46,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/home/alat/{id}', [alatController::class, 'show']);
 
     Route::apiResource('/keranjang', KeranjangController::class);
+    Route::delete('/keranjang', [KeranjangController::class, 'destroy']);
+    Route::post('/keranjang/update-qty', [KeranjangController::class, 'updateQty']);
     Route::post('/checkout', [peminjamanController::class, 'checkout']);
     
     Route::post('/peminjaman/transaksi/add', [peminjamanController::class, 'pinjamLangsung']);

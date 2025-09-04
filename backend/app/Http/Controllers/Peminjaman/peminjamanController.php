@@ -11,6 +11,7 @@ use App\Models\Ulasan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class peminjamanController extends Controller
 {
@@ -62,31 +63,36 @@ class peminjamanController extends Controller
     public function checkout(Request $request)
     {
         $user_id = auth()->user()->id;
-        $peminjaman_id = $request->input('peminjaman_id');
+        $keranjang = $request->input('keranjang');
 
-        $transaksi = Transaksi::create([
-            'peminjam_id' => $user_id,
-            "tanggal_pinjam" => now(),
-            "tanggal_kembali" => now()->addDays(3),
-            "status" => "pending"
-        ]);
+        DB::beginTransaction();
 
-        foreach ($peminjaman_id as $id) {
-            Transaksi::where('id', $id)
-                ->where('peminjam_id', $user_id)
-                ->update(['transaksi_id' => $transaksi->id]);
-        }
-
-        if (!$transaksi) {
+        try {
+            $transaksi = Transaksi::create([
+                'peminjam_id' => $user_id,
+                "tanggal_pinjam" => now(),
+                "tanggal_kembali" => now()->addDays(3),
+                "status" => "pending"
+            ]);
+    
+            foreach ($keranjang as $item) {
+                $transaksi->transaksi_details()->create([
+                    'alat_id' => $item->alat_id,
+                    'jumlah' => $item->qty,
+                ]);
+            }
+    
             return response()->json([
-                "message" => "gagal melakukan checkout"
-            ], 500);
+                "message" => "berhasil checkout",
+                "transaksi_id" => $transaksi->id
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => "Gagal melakukan checkout",
+                'error' => $th->getMessage()
+            ], $th->getCode());
         }
 
-        return response()->json([
-            "message" => "berhasil checkout",
-            "transaksi_id" => $transaksi->id
-        ], 200);
     }
 
     // 4. Konfirmasi oleh admin
