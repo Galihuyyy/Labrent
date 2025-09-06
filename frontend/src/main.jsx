@@ -21,6 +21,6 @@ import '@fontsource-variable/montserrat';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <RouterProvider router={router}></RouterProvider>
+      <RouterProvider router={router}></RouterProvider>
   </StrictMode>,
 )
