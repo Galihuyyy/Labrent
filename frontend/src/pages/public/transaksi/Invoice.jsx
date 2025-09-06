@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { getToken } from '../../utils/getToken'
-import { config } from '../../config'
+import { getToken } from '../../../utils/getToken'
+import { config } from '../../../config'
 import axios from 'axios'
-import NavbarClient from '../../components/fragments/NavbarClient'
+import NavbarClient from '../../../components/fragments/NavbarClient'
 
-export const Receipt = () => {
+export const Invoice = () => {
     const token = getToken()
     const apiUrl = config.API_URL
 

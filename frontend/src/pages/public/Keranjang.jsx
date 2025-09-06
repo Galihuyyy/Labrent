@@ -320,6 +320,6 @@ export const Counter = ({ value, onChange, className, max = 99, min = 1 }) => {
 	);
 };
 
-export const Card = ({ children }) => {
-	return (<div className="rounded-sm w-full border p-3 sm:px-12 flex items-center justify-between">{children}</div>)
+export const Card = ({ children, className = "" }) => {
+	return (<div className={`rounded-sm w-full border p-3 sm:px-12 flex items-center justify-between ${className}`}>{children}</div>)
 }

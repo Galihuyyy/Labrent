@@ -91,8 +91,8 @@ const NavbarClient = ({ withSearch = false, onInputSearch, onClickSearch }) => {
 
 export default NavbarClient
 
-export const Profile = ({ abjad }) => (
-  <div className="profile-picture bg-indigo-800 border border-neutral-400 text-white w-9 h-9 rounded-full text-lg flex items-center justify-content-center">
+export const Profile = ({ abjad, className = "" }) => (
+  <div className={`profile-picture bg-indigo-800 border border-neutral-400 text-white w-9 h-9 rounded-full text-lg flex items-center justify-content-center ${className}`}>
     <p className='m-0'>{abjad?.charAt(0)}</p>
   </div>
 );
