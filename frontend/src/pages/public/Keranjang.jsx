@@ -218,6 +218,7 @@ export const useKeranjang = (apiUrl, token) => {
 		try {
 			setLoading(true);
 			sessionStorage.getItem('selectedIdKeranjang') ? sessionStorage.removeItem('selectedIdKeranjang') : ''
+			sessionStorage.getItem('selectedIdAlat') ? sessionStorage.removeItem('selectedIdAlat') : ''
 			sessionStorage.setItem('selectedIdKeranjang', JSON.stringify(selectedIds))
 		} catch (error) {
 			console.error("Gagal checkout:", error);
@@ -228,10 +229,6 @@ export const useKeranjang = (apiUrl, token) => {
 			}, 500);
 		}
 	};
-
-	useEffect(() => {
-		getKeranjang();
-	}, []);
 
 	return {
 		loading,

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import banner from '../../assets/images/banner-client.png'
-import NavbarClient from '../../components/fragments/NavbarClient'
-import useAlat from '../../hooks/HookAlat'
-import WithLoading from '../../components/Layout/WithLoading'
+import banner from '../../../assets/images/banner-client.png'
+import NavbarClient from '../../../components/fragments/NavbarClient'
+import useAlat from '../../../hooks/HookAlat'
+import WithLoading from '../../../components/Layout/WithLoading'
 
 export const ProductList = () => {
   const { loading, alatTersedia, alatTidakTersedia, getDataAlat } = useAlat()

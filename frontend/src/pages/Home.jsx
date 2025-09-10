@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Navbar from '../components/fragments/Navbar'
-import { ProductList } from './public/ProductList'
 import Alat from './private/Alat/Alat'
+import { ProductList } from './public/alat/ProductList'
 
 export const Home = () => {
 

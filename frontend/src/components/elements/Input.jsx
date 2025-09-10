@@ -1,18 +1,14 @@
 
-const Input = (props) => {
-    const {children, type = "text", name, style, onChange, value, className = "", disabled = false} = props
+const Input = ({children, name, style, className = "", ...props }) => {
 
     return (
         <div className={`relative z-0 w-full group ${style}`}>
             <input
-            type={type}
+            {...props}
             name={name}
             id={name}
-            value={value}
-            onChange={onChange}
             placeholder=" "
             required
-            disabled={disabled}
             className={`block py-2.5 ps-4 text-2xl w-full text-gray-900 bg-transparent border-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-indigo-300 peer rounded-pill ${className}`}
             />
             <label
@@ -22,8 +18,6 @@ const Input = (props) => {
             {children}
             </label>
         </div>
-
-
         
     )
 }

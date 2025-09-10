@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom"
 import Login from "../pages/auth/Login"
 import Auth from "../middleware/Auth"
-import { DetailProduct } from "../pages/public/DetailProduct"
+import { DetailProduct } from "../pages/public/alat/DetailProduct"
 import Admin from "../pages/private/Admin/Admin"
 import Peminjaman from "../pages/private/Peminjaman/Peminjaman"
 import { Home } from "../pages/Home"
@@ -10,6 +10,7 @@ import Checkout from "../pages/public/keranjang/Checkout"
 import { DetailKeranjang } from "../pages/public/keranjang/DetailKeranjang"
 import { Invoice } from "../pages/public/transaksi/Invoice"
 import Transaksi from "../pages/public/transaksi/Transaksi"
+import CheckoutAlat from "../pages/public/alat/CheckoutAlat"
 
 const router = createBrowserRouter([
     {
@@ -22,7 +23,16 @@ const router = createBrowserRouter([
     },
     {
         path : '/detail/:id',
-        element : <Auth auth={true}> <DetailProduct/> </Auth>
+        children : [
+            {
+                path : '',
+                element : <Auth auth={true}> <DetailProduct/> </Auth>
+            },
+            {
+                path : 'checkout',
+                element : <Auth auth={true}> <CheckoutAlat/> </Auth>
+            }, 
+        ]
     },
     {
         path : '/admin',

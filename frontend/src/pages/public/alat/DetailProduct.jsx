@@ -1,15 +1,16 @@
 // src/pages/public/DetailProduct.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import NavbarClient from '../../components/fragments/NavbarClient';
-import { config } from '../../config';
+import NavbarClient from '../../../components/fragments/NavbarClient';
+import { config } from '../../../config';
 import axios from 'axios';
-import { getToken } from '../../utils/getToken';
+import { getToken } from '../../../utils/getToken';
 import { toast, ToastContainer } from 'react-toastify';
-import useAlat from '../../hooks/HookAlat';
-import WithLoading from '../../components/Layout/WithLoading';
-import Spinner from '../../components/elements/Spinner';
-import Badge from '../../components/elements/Badge';
+import useAlat from '../../../hooks/HookAlat';
+import WithLoading from '../../../components/Layout/WithLoading';
+import Spinner from '../../../components/elements/Spinner';
+import Badge from '../../../components/elements/Badge';
+
 
 export const DetailProduct = () => {
   const { id } = useParams();
@@ -53,7 +54,7 @@ export const DetailProduct = () => {
               </Badge>
               <div className="sm:flex items-center gap-x-3 hidden ms-6 mt-3">
                 <ButtonAddKeranjang qty={count} />
-                <ButtonPinjamSekarang />
+                <ButtonPinjamSekarang qty={count} />
               </div>
             </div>
           </div>
@@ -63,7 +64,7 @@ export const DetailProduct = () => {
       <footer className='fixed-bottom bg-white border shadow-sm w-full flex justify-center py-2 sm:hidden'>
         <div className="flex items-center justify-end w-11/12 sm:w-9/12  gap-x-2">
           <ButtonAddKeranjang qty={count} />
-          <ButtonPinjamSekarang />
+          <ButtonPinjamSekarang qty={count} />
         </div>
       </footer>
     </div>
@@ -150,8 +151,23 @@ export const ButtonAddKeranjang = ({ qty }) => {
   )
 }
 
-export const ButtonPinjamSekarang = () => {
-  const pinjamLangsung = () => {};
+export const ButtonPinjamSekarang = ({qty}) => {
+  const { id } = useParams();
+  const [loading, setLoading] = useState()
+  const pinjamLangsung = () => {
+    try {
+			sessionStorage.getItem('selectedIdAlat') ? sessionStorage.removeItem('selectedIdAlat') : ''
+			sessionStorage.getItem('selectedIdKeranjang') ? sessionStorage.removeItem('selectedIdKeranjang') : ''
+      sessionStorage.setItem('selectedIdAlat', JSON.stringify({id : Number(id), qty : qty}))
+			setTimeout(function () {
+				window.location.href = `/detail/${id}/checkout`
+			}, 500);
+    } catch (error) {
+			console.error("Gagal checkout:", error);
+		} finally {
+			setLoading(false);
+		}
+  };
   return (
     <button className='max-w-fit py-2 px-3 !rounded-sm text-white !text-sm bg-indigo-600 hover:bg-indigo-500 duration-200' onClick={() => { pinjamLangsung() }}>
       Pinjam Sekarang
