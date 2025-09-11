@@ -43,14 +43,10 @@ const router = createBrowserRouter([
         children : [
             {
                 path : '',
-                element : <Auth auth={true} adminOnly="true"> <Peminjaman/> </Auth>
+                element : <Auth auth={true}> <Peminjaman/> </Auth>
             },
             {
-                path : 'siswa',
-                element : <Auth auth={true}> <Transaksi/> </Auth>
-            },
-            {
-                path : 'siswa/pending',
+                path : 'pending',
                 element : <Auth auth={true}> <Invoice/> </Auth>
             },
         ]

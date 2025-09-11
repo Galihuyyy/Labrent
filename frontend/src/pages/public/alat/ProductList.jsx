@@ -24,7 +24,7 @@ export const ProductList = () => {
       <NavbarClient withSearch="true" onInputSearch={(value) => {setSearchValue(value)}} onClickSearch={() => {handleSearch()}}></NavbarClient>
 
       <div className="w-full mx-auto mt-6 mb-12 max-lg:mb-6">
-        <div className="relative w-full overflow-hidden rounded-xl shadow-lg aspect-[10/4]">
+        <div className="relative w-full overflow-hidden rounded-xl shadow-lg aspect-[10/4] md:aspect-[10/2.5]">
           <img  
             src={banner}
             alt="Banner Ecommerce"
@@ -38,10 +38,10 @@ export const ProductList = () => {
         <div className="right-side">
           <h5 className='text-start !text-blue-900 relative max-w-fit !mb-6 h-fit !text-sm md:!text-md lg:!text-lg'>Alat Tersedia <span className='absolute -bottom-2 left-0 md:left-1/2 md:translate-middle-x w-50 h-1 rounded bg-blue-800'></span></h5>
           <WithLoading loading={loading}>
-            <div className="product-card grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4 min-h-24">
+            <div className="product-card grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4 min-h-24">
               {alatTersedia.map((alat, i) => (
                 <div key={i} onClick={() => { window.location.href = `/detail/${alat.id}` }} className="bg-white h-fit min-h-48 rounded shadow-sm border-neutral-200 border-[1px] duration-100 hover:border-indigo-500 cursor-pointer align-middle flex flex-col w-full">
-                  <div className='w-full h-30 mb-1 overflow-hidden rounded flex items-center justify-center'>
+                  <div className='w-full h-30 mb-1 overflow-hidden rounded-t flex items-center justify-center'>
                     <img src={alat.foto_alat} width={120} className='w-full object-cover' />
                   </div>
                   <div className="px-2 flex flex-col h-full">

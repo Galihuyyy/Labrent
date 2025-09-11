@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import AdminPage from '../../../components/Layout/AdminPage'
-import { getToken } from '../../../utils/getToken'
+import { getRole, getToken } from '../../../utils/getToken'
 import { config } from '../../../config'
 import axios from 'axios'
 import Button from '../../../components/elements/Button'
@@ -8,8 +8,13 @@ import { Add, Check } from '@mui/icons-material'
 import Table from './resource/Table'
 import CardHeader from '../../../components/fragments/CardHeader'
 import ModalForm from './resource/ModalForm'
+import Transaksi from '../../public/transaksi/Transaksi'
+import { usePeminjaman } from '../../../hooks/HookPeminjaman'
 
 function Peminjaman() {
+    if (getRole() === 'siswa') {
+        return <Transaksi />;
+    }
 
     const token = getToken()
     const apiUrl = config.API_URL
@@ -17,24 +22,10 @@ function Peminjaman() {
     const [openModal, setOpenModal] = useState(false)
     const [mode, setMode] = useState(false)
 
-    const [dataPeminjaman, setDataPeminjaman] = useState([{
-        peminjaman: {
-            peminjam: {
-                profile: {}
-            }
-        }
-    }])
-
-    const getPeminjaman = () => {
-        axios.get(`${apiUrl}/transaksi/get`, { headers: { Authorization: `Bearer ${token}` } })
-            .then(res => {
-                console.log(res.data.data)
-                setDataPeminjaman(res.data.data)
-            })
-            .catch(err => {
-                console.log(err)
-            })
-    }
+    const { dataPeminjaman, getPeminjaman } = usePeminjaman()
+    useEffect(() => {
+        getPeminjaman(false)
+    }, [])
 
     const openModalFn = (mode) => {
         setOpenModal(true)
@@ -58,9 +49,6 @@ function Peminjaman() {
             })
     }
 
-    useEffect(() => {
-        getPeminjaman()
-    }, [])
 
     return (
         <AdminPage>
@@ -79,7 +67,7 @@ function Peminjaman() {
                 </CardHeader>
                 <Table data={dataPeminjaman}></Table>
             </div>
-            <ModalForm open={openModal} setOpenModal={setOpenModal} getPeminjaman={() => {getPeminjaman()}} mode={mode}/>
+            <ModalForm open={openModal} setOpenModal={setOpenModal} getPeminjaman={() => { getPeminjaman() }} mode={mode} />
         </AdminPage>
     )
 }

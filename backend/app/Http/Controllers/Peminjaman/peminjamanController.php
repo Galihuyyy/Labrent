@@ -16,7 +16,8 @@ use Illuminate\Support\Facades\Http;
 class peminjamanController extends Controller
 {
 
-    private function  generateCode($number){
+    private function  generateCode($number)
+    {
         $prefix = 'TRX' . date('Ymd') . str_pad($number, 4, '0', STR_PAD_LEFT);
         return $prefix;
     }
@@ -74,14 +75,14 @@ class peminjamanController extends Controller
                 "tanggal_kembali" => now()->addDays(3),
                 "status" => "pending"
             ]);
-    
+
             foreach ($keranjang as $item) {
                 $transaksi->transaksi_details()->create([
                     'alat_id' => $item->alat_id,
                     'jumlah' => $item->qty,
                 ]);
             }
-    
+
             return response()->json([
                 "message" => "berhasil checkout",
                 "transaksi_id" => $transaksi->id
@@ -92,7 +93,6 @@ class peminjamanController extends Controller
                 'error' => $th->getMessage()
             ], $th->getCode());
         }
-
     }
 
     // 4. Konfirmasi oleh admin
@@ -156,11 +156,13 @@ class peminjamanController extends Controller
         ]);
     }
 
-    public function getTransaksi()
+    public function getTransaksi(Request $request)
     {
 
         $transaksi = Transaksi::with(['transaksi_details.alat', 'peminjam.profile'])
+            ->when($request->transaksi_user, fn($q) => $q->where('peminjam_id', auth()->id()))
             ->get();
+
 
         return response()->json([
             'message' => 'Riwayat transaksi berhasil diambil',
