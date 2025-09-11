@@ -2,6 +2,9 @@
 const Badge = ({ variant, className, children }) => {
 	let variantStyle = "";
 	switch (variant) {
+		case 'primary' :
+			variantStyle = "bg-blue-100 text-blue-700"
+		    break
 		case 'success' :
 			variantStyle = "bg-green-100 text-green-700"
 		    break

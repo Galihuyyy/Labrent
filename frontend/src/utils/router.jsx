@@ -46,7 +46,7 @@ const router = createBrowserRouter([
                 element : <Auth auth={true}> <Peminjaman/> </Auth>
             },
             {
-                path : 'pending',
+                path : ':id',
                 element : <Auth auth={true}> <Invoice/> </Auth>
             },
         ]

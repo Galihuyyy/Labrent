@@ -40,7 +40,7 @@ class alatController extends Controller
         $search = $request->input('search');
         try {
             $alat = Alat::with('foto_alat')
-                ->when($search, function($query, $search) {
+                ->when($search, function ($query, $search) {
                     $query->where('name', 'like', "%{$search}%");
                 })
                 ->orderByDesc('created_at')
@@ -57,12 +57,17 @@ class alatController extends Controller
                         'updated_at' => $item->updated_at,
                     ];
                 });
+
+            $alat_tidak_tersedia = $alat->filter(function ($a) {
+                return $a['stok'] == 0 || $a['keterangan'] !== 'aman';
+            })->values();
+
             if ($alat) {
                 return response()->json([
                     'message' => 'berhasil mendapatkan data alat!',
                     'data' => [
-                        "alat_tersedia" => $alat->where('stok', '>', 0)->values(),
-                        "alat_tidak_tersedia" => $alat->where('stok', '=', 0)->values()
+                        "alat_tersedia" => $alat->where('stok', '>', 0)->where('status', 'aman')->values(),
+                        "alat_tidak_tersedia" => $alat_tidak_tersedia
                     ]
                 ], 200);
             }
@@ -72,8 +77,6 @@ class alatController extends Controller
                 'error' => $th->getMessage()
             ], 500);
         }
-
-
     }
 
 

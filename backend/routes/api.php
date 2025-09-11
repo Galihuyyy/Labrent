@@ -55,6 +55,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/ulasan', [peminjamanController::class, 'tambahUlasan']);
     Route::get('/transaksi', [peminjamanController::class, 'riwayatTransaksi']);
     Route::get('/transaksi/get', [peminjamanController::class, 'getTransaksi']);
+    Route::get('/transaksi/{id}', [peminjamanController::class, 'showTransaksi']);
 
 
 

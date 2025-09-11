@@ -10,6 +10,7 @@ export const usePeminjaman = () => {
 	
 	// State
 	const [dataPeminjaman, setDataPeminjaman] = useState()
+	const [detailPeminjaman, setDetailPeminjaman] = useState()
 	const [loading, setLoading] = useState(false)
 	
 	// Function
@@ -31,9 +32,24 @@ export const usePeminjaman = () => {
 		})
     }
 
+	const showPeminjaman = (id) => {
+		setLoading(true)
+        axios.get(`${apiUrl}/transaksi/${id}`, { headers: { Authorization: `Bearer ${token}` } })
+		.then(res => {
+			setDetailPeminjaman(res.data.data)
+		})
+		.catch(err => {
+			console.log(err)
+		})
+		.finally(() => {
+			setLoading(false)
+		})
+    }
+
 	// Return export
 	return {
 		loading,
 		dataPeminjaman, getPeminjaman,
+		detailPeminjaman, showPeminjaman,
 	}
 }

@@ -194,8 +194,8 @@ function Alat() {
     <AdminPage>
         <div className="mt-6 pb-6">
           <CardHeader icon={<HardwareOutlined/>} title="Manajemen Alat" withButton="true" buttonIcon={<Add/>} buttonTitle="Tambah Alat" onClickBtn={() => {toggleForm('create')}} />
-          <Table icon={<PlaylistAddCheck/>} title="Alat Tersedia" data={dataAlatTersedia} onEdit={(method, item) => {handleShowAndUpdate('edit',item)}} onShow={(method, item) => {handleShowAndUpdate('show',item)}} onDelete={(method, item) => {handleDelete('delete', item)}} loading={loading}/>
-          <Table icon={<PlaylistRemove/>} title="Alat Tidak Tersedia" data={dataAlatTidakTersedia} loading={loading}/>
+          <Table icon={<PlaylistAddCheck/>} title="Alat Tersedia" data={dataAlatTersedia}  onEdit={(method, item) => {handleShowAndUpdate('edit',item)}} onShow={(method, item) => {handleShowAndUpdate('show',item)}} onDelete={(method, item) => {handleDelete('delete', item)}} loading={loading}/>
+          <Table icon={<PlaylistRemove/>} title="Alat Tidak Tersedia" data={dataAlatTidakTersedia}  onEdit={(method, item) => {handleShowAndUpdate('edit',item)}} onShow={(method, item) => {handleShowAndUpdate('show',item)}} onDelete={(method, item) => {handleDelete('delete', item)}} loading={loading}/>
 
           {openForm &&
             <ModalForm

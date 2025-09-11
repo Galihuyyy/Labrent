@@ -170,6 +170,31 @@ class peminjamanController extends Controller
         ]);
     }
 
+    public function showTransaksi(Request $request, string $id)
+    {
+        $transaksi = Transaksi::with(['transaksi_details.alat', 'peminjam.profile'])
+            ->findOrFail($id);
+
+        return response()->json([
+            'message' => 'Detail transaksi berhasil diambil',
+            'data' => [
+                'status'          => $transaksi->status,
+                'nama_peminjam'   => $transaksi->nama_peminjam,
+                'email_peminjam'  => $transaksi->peminjam?->email,
+                'tanggal_pinjam'  => $transaksi->tanggal_pinjam,
+                'tanggal_kembali' => $transaksi->tanggal_kembali,
+
+                'transaksi_details' => $transaksi->transaksi_details?->map(function ($detail) {
+                    return [
+                        'jumlah' => $detail->jumlah,
+                        'nama_alat'   => $detail->alat->name ?? null,
+                        'keterangan_alat' => $detail->alat->keterangan ?? null,
+                    ];
+                }),
+            ]
+        ]);
+    }
+
     public function pinjamLangsung(Request $request)
     {
 

@@ -7,7 +7,7 @@ const Auth = ({ children, auth, adminOnly = false }) => {
   const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
   if (auth) {
-    if (!token || (adminOnly && getRole() !== 'admin') || (!adminOnly && getRole() === 'admin')) {
+    if (!token || (adminOnly && getRole() !== 'admin')) {
       return <Navigate to="/auth" replace />;
     }
     return children;

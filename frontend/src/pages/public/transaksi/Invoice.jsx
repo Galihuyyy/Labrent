@@ -1,126 +1,148 @@
 import React, { useEffect, useState } from 'react'
-import { getToken } from '../../../utils/getToken'
+import { getRole, getToken } from '../../../utils/getToken'
 import { config } from '../../../config'
 import axios from 'axios'
 import NavbarClient from '../../../components/fragments/NavbarClient'
+import { ChevronLeft, Close } from '@mui/icons-material'
+import { useParams, Link } from 'react-router-dom'
+import { usePeminjaman } from '../../../hooks/HookPeminjaman'
+import WithLoading from '../../../components/Layout/WithLoading'
+import Badge from '../../../components/elements/Badge'
+import { useServices } from '../../../services/Services'
+import Navbar from '../../../components/fragments/Navbar'
+import AdminPage from '../../../components/Layout/AdminPage'
 
 export const Invoice = () => {
     const token = getToken()
     const apiUrl = config.API_URL
 
-    const [trxPending, setTrxPending] = useState({})
+    const { id } = useParams()
+    const { loading, detailPeminjaman, showPeminjaman } = usePeminjaman()
+    const { getVariantByStatus } = useServices()
 
-    const hapusTrx = (id) => {
-
-        const yakin = confirm(`yakin ingin hapus transaksi id ${id} ? `)
-
-        if (!yakin) {
-            return
-        }
-        
-        axios.delete(`${apiUrl}/admin/transaksi/delete/${id}`, {headers : {Authorization : `Bearer ${token}`}})
-        .then(res => {
-            window.location.reload()
-        })
-        .catch(err => {
-            console.log(err)
-        })
+    let nb
+    switch (detailPeminjaman?.status) {
+        case "pending":
+            nb = `Silakan datang ke admin dan konfirmasi kode transaksi Anda. Transaksi hanya berlaku 3 x 24 jam sejak dibuat.Jika tidak dikonfirmasi dalam batas waktu tersebut, transaksi akan otomatis dibatalkan.`
+            break;
+        case "ditolak":
+            nb = 'Pengajuan peminjaman ini ditolak oleh admin. Untuk informasi lebih lanjut, silakan hubungi admin.'
+            break;
+        case "expired":
+            nb = 'Pengajuan peminjaman ini expired karena anda tidak mengkonfirmasi selama 3x24 jam. Untuk informasi lebih lanjut, silakan hubungi admin.'
+            break;
+        case "dipinjam":
+            nb = 'Barang sedang Anda pinjam. Mohon dijaga dengan baik dan pastikan dikembalikan sesuai jadwal yang telah ditentukan.'
+            break;
+        case "dikembalikan":
+            nb = 'Barang telah dikembalikan. Terima kasih telah mengikuti prosedur peminjaman dengan baik.'
+            break;
     }
 
-    const getUser = () => {
-        axios.get(`${apiUrl}/user`, {headers : {Authorization : `Bearer ${token}`}})
-        .then(res => {
-            setTrxPending(res.data.data.transaksi);
-            console.log(res.data.data);
-        })
-        .catch(err => {
-            console.log(err);
-        })
-    }
 
     useEffect(() => {
-        getUser()
+        showPeminjaman(id)
     }, [])
-    
-  return (
-    <div className="pb-20 px-4 pt-28">
-        <NavbarClient/>
-        {
-            !!trxPending &&
-                <main className='mx-auto p-4 rounded border shadow w-11/12 sm:w-1/2 text-neutral-700'>
-                    <div className="flex items-center gap-x-3 cursor-pointer" onClick={() => {window.location.href = "/"}}>
-                        <i className="bi bi-arrow-left text-2xl mb-3"></i>
-                        <p className='text-xl'>Kembali</p>
-                    </div>
-                    {!!!trxPending && 
-                        <p className='text-neutral-600'>404 : Anda tidak memiliki pesanan pending</p>
-                    }
-                    {!!trxPending &&
-                        <>
-                            <h3 className='text-neutral-500 pb-3 mb-3'>Detail Transaksi</h3>
-                            <h2 className='text-end sm:pe-3 border-b border-indigo-600 pb-3' style={{color:'#4f39f6'}}>{trxPending.transaksi_code}</h2>
-                            <div className=' pb-3'>
-                                <p className={`${trxPending.status == 'pending' ? 'bg-amber-400 text-amber-700' : ''} w-fit py-1 px-3 mb-0 rounded-pill text-sm font-semibold`}>{trxPending.status}</p>
-                                <h1 className='text-neutral-600 mb-0'>{trxPending?.transaksi_details?.alat.name}</h1>
-                                <p className="mb-0">{trxPending?.transaksi_details?.jumlah} Barang</p>
-                            </div>
-                            <div className='border-b border-indigo-600 pb-3 text-neutral-600 text-sm pt-3'>
-                                <p className='w-1/2'>Hai! Peminjaman kamu masih nunggu konfirmasi nih. Yuk, segera ke lab buat validasi dan lanjutin prosesnya yaa!</p>
-                            </div>
-                            <button onClick={() => {hapusTrx(trxPending.id)}} className='w-full bg-red-600 rounded text-white border-[1px] border-black mt-3 py-1'>Batalkan</button>
-                        </>
-                    }
 
-                </main>
-        }
-
-        {!!!trxPending &&
+    const content = (
         <>
-            <p onClick={() => {window.location.href = '/'}} className="cursor-pointer text-xl font-semibold text-neutral-600"><i className="bi bi-caret-left"></i> Riwayat Peminjaman</p>
+            {getRole() !== 'admin' && <NavbarClient />}
+            {
+                !!detailPeminjaman &&
+                <WithLoading loading={loading}>
+                    <div className={`mx-auto border flex flex-col ${getRole() === 'admin' ? 'mt-6' : ''} gap-y-12 shadow !w-full sm:w-1/2 text-neutral-700`}>
+                        <header className="flex flex-col gap-y-12 pb-12 bg-zinc-100 px-12">
+                            <div className="h-28 flex">
+                                <div className="h-full w-34 pb-1 bg-indigo-400 text-white flex items-end justify-content-center">
+                                    <h5>INVOICE</h5>
+                                </div>
+                                <div className="w-full h-full pb-1 flex flex-col justify-between items-end pt-4">
+                                    <Link to="/peminjaman">
+                                        <Close />
+                                    </Link>
+                                    <p className='m-0 font-semibold text-xs text-zinc-400'>
+                                        {new Date(detailPeminjaman.tanggal_pinjam).toLocaleDateString("id-ID", {
+                                            weekday: "long",
+                                            day: "2-digit",
+                                            month: "long",
+                                            year: "numeric",
+                                        })}
+                                        <Badge variant={getVariantByStatus(detailPeminjaman.status)}>{detailPeminjaman.status}</Badge>
+                                    </p>
 
-            <div className="w-auto overflow-x-auto mt-4">
-                <table className="min-w-[600px] w-full border border-gray-200 text-sm text-left">
-                    <thead className="bg-gray-100 text-gray-600 uppercase">
-                    <tr>
-                        <th className="px-4 py-2 border">Trx Id</th>
-                        <th className="px-4 py-2 border">Peminjam</th>
-                        <th className="px-4 py-2 border">Email Peminjam</th>
-                        <th className="px-4 py-2 border">No Telepon</th>
-                        <th className="px-4 py-2 border">Gender</th>
-                        <th className="px-4 py-2 border">Alat Dipinjam</th>
-                        <th className="px-4 py-2 border">Jumlah</th>
-                        <th className="px-4 py-2 border">Status</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                        {dataPeminjaman.map((item,i) => (
-                            <tr key={i} className="hover:bg-gray-50">
-                                <td className="px-4 py-2 border">{item.id}</td>
-                                <td className="px-4 py-2 border">{item.peminjaman?.peminjam?.profile.name}</td>
-                                <td className="px-4 py-2 border">{item.peminjaman?.peminjam?.email}</td>
-                                <td className="px-4 py-2 border">{item.peminjaman?.peminjam?.profile.no_telp}</td>
-                                <td className="px-4 py-2 border">{item.peminjaman?.peminjam?.profile.gender}</td>
-                                <td className="px-4 py-2 border">{item.peminjaman?.alat?.name}</td>
-                                <td className="px-4 py-2 border">{item.peminjaman?.jumlah}</td>
-                                <td className="px-4 py-2 border">
-                                    <span className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${
-                                        item.status === 'biru' || item.status === 'pending' ? 'text-yellow-700 bg-yellow-200' :
-                                        item.status === 'dikembalikan' ? 'text-green-700 bg-green-200' :
-                                        item.status === 'ditolak' ? 'text-red-700 bg-red-200' : 'text-blue-700 bg-blue-200'
-                                        }`}>
-                                        {item.status}
+                                </div>
+
+                            </div>
+                            <div className="flex flex-col w-full">
+                                <div className="flex items-center justify-between w-full mx-auto font-semibold text-xs text-indigo-600">
+                                    <p className=" m-0">PREPARED FOR</p>
+
+                                    {/* Line with dots */}
+                                    <div className="flex items-center flex-1 mx-4">
+                                        <span className="w-1.5 h-1.5 bg-indigo-600 rounded-full"></span>
+                                        <div className="flex-1 border-t-2 border-indigo-600"></div>
+                                        <span className="w-1.5 h-1.5 bg-indigo-600 rounded-full"></span>
+                                    </div>
+
+                                    <p className="m-0">PREPARED BY</p>
+                                </div>
+                                <div className="flex items-start pt-1.5 justify-between w-full mx-auto">
+                                    <div className="text-start">
+                                        <p className="text-md font-bold m-0">{detailPeminjaman.nama_peminjam}</p>
+                                        <p className="text-sm m-0">{detailPeminjaman.email_peminjam}</p>
+                                    </div>
+                                    <div className="text-end">
+                                        <p className="font-bold m-0">Labrent</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </header>
+                        <main className='py-12 px-12'>
+                            <div className="w-auto overflow-x-auto">
+                                <table className="table-auto min-w-[300px] w-full border-gray-200 text-sm text-left">
+                                    <thead className="text-gray-400 uppercase !border-b">
+                                        <tr className='font-medium text-xs [&>td]:pb-3'>
+                                            <td>Alat</td>
+                                            <td>Qty</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {detailPeminjaman.transaksi_details?.map(i => (
+                                            <tr className="text-xs [&>td]:py-3   text-zinc-400 font-medium">
+                                                <td>{i.nama_alat}</td>
+                                                <td className="ps-2">{i.jumlah}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </main>
+                        {getRole() !== 'admin' &&
+                            <footer className='px-12 pb-12'>
+                                <p className='flex flex-col text-xs text-zinc-500'>
+                                    <span className='font-medium'>NB</span>
+                                    <span>
+                                        {nb}
                                     </span>
+                                </p>
+                                {detailPeminjaman.status === 'pending' &&
+                                    <button onClick={() => { hapusTrx(detailPeminjaman.id) }} className='w-full bg-red-600 rounded text-white border-[1px] border-black mt-3 py-1'>Batalkan</button>
+                                }
+                            </footer>
+                        }
+                    </div>
+                </WithLoading>
+            }
+        </>
+    )
 
-                                </td>
-
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-            </>
-        }
-
-    </div>
-  )
+    if (getRole() === 'admin') {
+        return <AdminPage>{content}</AdminPage>
+    } else {
+        return (
+            <div className="pb-20 px-4 pt-28">
+                {content}
+            </div >
+        )
+    }
 }

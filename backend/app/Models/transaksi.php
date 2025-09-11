@@ -4,14 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class transaksi extends Model
+class Transaksi extends Model
 {
     protected $table = "tr_transaksi", $guarded = [];
     public $timestamps = false;
 
     public function transaksi_details()
     {
-        return $this->hasOne(TransaksiDetails::class, 'transaksi_id', 'id');
+        return $this->hasMany(TransaksiDetails::class, 'transaksi_id', 'id');
     }
 
     public function peminjam()

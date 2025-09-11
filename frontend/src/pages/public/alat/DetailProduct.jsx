@@ -10,6 +10,7 @@ import useAlat from '../../../hooks/HookAlat';
 import WithLoading from '../../../components/Layout/WithLoading';
 import Spinner from '../../../components/elements/Spinner';
 import Badge from '../../../components/elements/Badge';
+import { useServices } from '../../../services/Services';
 
 
 export const DetailProduct = () => {
@@ -17,6 +18,7 @@ export const DetailProduct = () => {
   const apiUrl = config.API_URL;
   const token = getToken();
   const { loading, detailAlat, getDetailAlat } = useAlat();
+  const { getVariantByKeterangan } = useServices()
   const [count, setCount] = useState(1);
 
   useEffect(() => {
@@ -42,20 +44,28 @@ export const DetailProduct = () => {
               <img className='w-full object-cover' src={detailAlat?.foto_alat} alt={detailAlat?.name} />
             </div>
             <div className='flex flex-column py-3'>
-              <h3>{detailAlat?.name}</h3>
+              <div className="flex items-center">
+                <h3 className='!m-0'>{detailAlat?.name}</h3>
+                <p className='!m-0 !mx-3'>-</p>
+                <Badge variant={getVariantByKeterangan(detailAlat.keterangan)} className={'!ms-0 !mt-0'}>{detailAlat?.keterangan}</Badge>
+              </div>
               <div className="deskripsi sm:pe-24 bg-neutral-50 sm:ps-6">
                 <label htmlFor="deskripsi" className='mb-2 text-black/75 font-medium text-sm'>Deskripsi</label>
                 <p id='deskripsi' className='text-black/50 text-sm'>{detailAlat?.deskripsi ?? 'No Description'}</p>
               </div>
-              <Counter max={detailAlat?.stok} count={count} setCount={setCount}></Counter>
+              {(detailAlat.stok > 0 && detailAlat.keterangan === 'aman') &&
+                <Counter max={detailAlat?.stok} count={count} setCount={setCount}></Counter>
+              }
               <Badge variant={'warning'}>
                 <i className="bi bi-info-circle-fill mr-1 text-[14px]"></i>
-                terpinjam {/* kalau ada data peminjaman, tampilkan jumlah */}
+                terpinjam
               </Badge>
-              <div className="sm:flex items-center gap-x-3 hidden ms-6 mt-3">
-                <ButtonAddKeranjang qty={count} />
-                <ButtonPinjamSekarang qty={count} />
-              </div>
+              {(detailAlat.stok > 0 && detailAlat.keterangan === 'aman') &&
+                <div className="sm:flex items-center gap-x-3 hidden ms-6 mt-3">
+                  <ButtonAddKeranjang qty={count} />
+                  <ButtonPinjamSekarang qty={count} />
+                </div>
+              }
             </div>
           </div>
         </WithLoading>
@@ -151,22 +161,22 @@ export const ButtonAddKeranjang = ({ qty }) => {
   )
 }
 
-export const ButtonPinjamSekarang = ({qty}) => {
+export const ButtonPinjamSekarang = ({ qty }) => {
   const { id } = useParams();
   const [loading, setLoading] = useState()
   const pinjamLangsung = () => {
     try {
-			sessionStorage.getItem('selectedIdAlat') ? sessionStorage.removeItem('selectedIdAlat') : ''
-			sessionStorage.getItem('selectedIdKeranjang') ? sessionStorage.removeItem('selectedIdKeranjang') : ''
-      sessionStorage.setItem('selectedIdAlat', JSON.stringify({id : Number(id), qty : qty}))
-			setTimeout(function () {
-				window.location.href = `/detail/${id}/checkout`
-			}, 500);
+      sessionStorage.getItem('selectedIdAlat') ? sessionStorage.removeItem('selectedIdAlat') : ''
+      sessionStorage.getItem('selectedIdKeranjang') ? sessionStorage.removeItem('selectedIdKeranjang') : ''
+      sessionStorage.setItem('selectedIdAlat', JSON.stringify({ id: Number(id), qty: qty }))
+      setTimeout(function () {
+        window.location.href = `/detail/${id}/checkout`
+      }, 500);
     } catch (error) {
-			console.error("Gagal checkout:", error);
-		} finally {
-			setLoading(false);
-		}
+      console.error("Gagal checkout:", error);
+    } finally {
+      setLoading(false);
+    }
   };
   return (
     <button className='max-w-fit py-2 px-3 !rounded-sm text-white !text-sm bg-indigo-600 hover:bg-indigo-500 duration-200' onClick={() => { pinjamLangsung() }}>

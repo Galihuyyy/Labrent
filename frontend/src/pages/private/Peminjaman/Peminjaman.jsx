@@ -32,34 +32,16 @@ function Peminjaman() {
         setMode(mode)
     }
 
-    const hapusTrx = (id) => {
-
-        const yakin = confirm(`yakin ingin hapus transaksi id ${id} ? `)
-
-        if (!yakin) {
-            return
-        }
-
-        axios.delete(`${apiUrl}/admin/transaksi/delete/${id}`, { headers: { Authorization: `Bearer ${token}` } })
-            .then(res => {
-                window.location.reload()
-            })
-            .catch(err => {
-                console.log(err)
-            })
-    }
-
-
     return (
         <AdminPage>
             <div className="pt-4">
                 <CardHeader title="Manajemen Peminjaman">
                     <div className='flex items-center gap-x-3'>
-                        <Button variant="primary" className="!w-fit" onClick={() => { openModalFn("confirm") }}>
+                        <Button variant="outline-primary" className="!w-fit btn-sm !bg-blue-100 hover:!bg-blue-500 hover:!text-white" onClick={() => { openModalFn("confirm") }}>
                             <Check />
                             Setujui Permintaan
                         </Button>
-                        <Button variant="primary" className="!w-fit" onClick={() => { openModalFn("return") }}>
+                        <Button variant="outline-primary" className="!w-fit btn-sm !bg-blue-100 hover:!bg-blue-500 hover:!text-white" onClick={() => { openModalFn("return") }}>
                             <Check />
                             Peminjaman Dikembalikan
                         </Button>

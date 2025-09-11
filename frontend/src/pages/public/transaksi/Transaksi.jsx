@@ -10,7 +10,7 @@ import { Key } from '@mui/icons-material'
 
 const Transaksi = () => {
 	// Variables
-	const positiveStatus = ["dipinjam", "dikembalikan", 'ditolak'];
+	const positiveStatus = ["dipinjam", "dikembalikan", 'ditolak', "expired"];
 
 	// State
 	const { loading, dataPeminjaman, getPeminjaman } = usePeminjaman()
@@ -45,14 +45,14 @@ const Transaksi = () => {
 							{pendingData?.length > 0 &&
 								<HistoryLayout title='Pending'>
 									{pendingData.map(item => (
-										<HistoryList key={item.id} totalItem={item.transaksi_details?.length || 0} tanggal={item.tanggal_pinjam} status={item.status} />
+										<HistoryList to={`/peminjaman/${item.id}`} key={item.id} totalItem={item.transaksi_details?.length || 0} tanggal={item.tanggal_pinjam} status={item.status} />
 									))}
 								</HistoryLayout>
 							}
 							{successData?.length > 0 &&
-								<HistoryLayout title='Success' type='success'>
+								<HistoryLayout title='Riwayat' type='secondary'>
 									{successData.map(item => (
-										<HistoryList key={item.id} totalItem={item.transaksi_details?.length || 0} tanggal={item.tanggal_pinjam} status={item.status} />
+										<HistoryList to={`/peminjaman/${item.id}`} key={item.id} totalItem={item.transaksi_details?.length || 0} tanggal={item.tanggal_pinjam} status={item.status} />
 									))}
 								</HistoryLayout>
 							}
@@ -80,7 +80,7 @@ export default Transaksi
 
 
 export const HistoryLayout = ({ children, title = '', type = 'pending' }) => {
-	const typeClassname = type == 'pending' ? '!text-yellow-700' : '!text-green-700'
+	const typeClassname = type == 'pending' ? '!text-yellow-700' : type == 'success' ? '!text-green-700' : '!text-gray-700'
 	return (
 		<div className="mb-6">
 			<h6 className={`${typeClassname}`}>{title}</h6>
@@ -105,8 +105,14 @@ export const HistoryList = ({ totalItem, tanggal, status, to = "" }) => {
 		case 'ditolak':
 			statusClassname = "!text-red-800"
 			break;
-		default:
+		case 'expired':
+			statusClassname = "!text-red-800"
+			break;
+		case 'pending':
 			statusClassname = "!text-yellow-700"
+			break;
+		default:
+			statusClassname = "!text-gray-700"
 			break;
 	}
 
