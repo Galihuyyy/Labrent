@@ -3,6 +3,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import logo from '../../assets/images/logo.png';
 import { ChevronRightOutlined, Receipt, Search, ShoppingCartOutlined } from '@mui/icons-material';
 import {Link} from 'react-router-dom'
+import Button from '../elements/Button';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { getToken } from '../../utils/getToken';
+import { config } from '../../config';
+import PopUpLogout from './PopUpLogout';
 
 const NavbarClient = ({ withSearch = false, onInputSearch, onClickSearch }) => {
   const users = JSON.parse(localStorage.getItem("user") || sessionStorage.getItem("user") || "null");
@@ -11,6 +17,32 @@ const NavbarClient = ({ withSearch = false, onInputSearch, onClickSearch }) => {
   const inputSearchRef = useRef(null);
   const profileRef = useRef(null);
   const toggleProfileRef = useRef(null);
+  const [logoutClick, setLogoutClick] = useState(false)
+  const token = getToken()
+  const apiUrl = config.API_URL
+
+  const logout = () => {
+        const toastLogoutId = toast.loading("Melakukan logout...");
+    
+        axios.post(`${apiUrl}/auth/logout`, {}, {headers : {Authorization : `Bearer ${token}`}})
+        .then(res => {
+            localStorage.clear();
+            sessionStorage.clear(); 
+            toast.update(toastLogoutId, {
+                type : 'success',
+                render : res.data?.message || 'Berhasil logout!',
+                isLoading : false,
+                hideProgressBar : false,
+                autoClose : true,
+                closeButton : true
+            })
+            setTimeout(function() {
+                window.location.reload()
+            }, 1000);
+        })
+        .catch(err => {console.log(err);})
+    }
+  
 
   useEffect(() => {
     if (openSearch && inputSearchRef.current) {
@@ -76,6 +108,7 @@ const NavbarClient = ({ withSearch = false, onInputSearch, onClickSearch }) => {
             <Profile abjad={users?.profile?.name} />
             <p className='m-0 text-sm font-medium'>{users?.profile?.name}</p>
             <p className='m-0 text-xs'>{users?.email}</p>
+            <Button onClick={() => setLogoutClick(true)} variant="outline-danger" className="!bg-red-100 !w-fit !py-0 !rounded-full mt-2 !text-red-600 hover:!bg-red-200">Logout</Button>
           </div>
           <div className="body flex items-start flex-column">
             <Link to='/keranjang' className='text-sm !no-underline !text-black/75 hover:bg-neutral-100 w-full px-3 py-2.5'>
@@ -86,7 +119,10 @@ const NavbarClient = ({ withSearch = false, onInputSearch, onClickSearch }) => {
           </div>
         </div>
       </div>
+      <PopUpLogout show={logoutClick} setShow={setLogoutClick} onLogout={() => {logout()}} />
     </nav>
+
+
   )
 }
 

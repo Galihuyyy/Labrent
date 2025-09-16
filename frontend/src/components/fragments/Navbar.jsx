@@ -3,8 +3,11 @@ import axios from 'axios'
 import { getToken } from '../../utils/getToken'
 import { config } from '../../config'
 import { toast, ToastContainer } from 'react-toastify'
+import { List, ListAlt, Menu } from '@mui/icons-material'
+import ListItem from '@mui/material/ListItem'
+import PopUpLogout from './PopUpLogout'
 
-const Navbar = () => {
+const Navbar = ({ setSidebarOpen }) => {
 
     const token = getToken()
     const apiUrl = config.API_URL
@@ -14,20 +17,6 @@ const Navbar = () => {
     const [logoutOn, setLogoutOn] = useState(false)
 
     const users = JSON.parse(localStorage.getItem("user") || sessionStorage.getItem("user"))
-
-
-    const [trxPending, setTrxPending] = useState({})
-
-
-    const getUser = () => {
-        axios.get(`${apiUrl}/user`, {headers : {Authorization : `Bearer ${token}`}})
-        .then(res => {
-            setTrxPending(res.data.transaksi_pending);
-        })
-        .catch(err => {
-            console.log(err);
-        })
-    }
 
     const logout = () => {
         const toastLogoutId = toast.loading("Melakukan logout...");
@@ -52,24 +41,15 @@ const Navbar = () => {
     }
 
     
-    useEffect(() => {
-        getUser()
-    }, [])
-    
     return (
         <>
         <ToastContainer
             position='top-center'
             theme='colored'
         />
-        <div className='max-md:px-4 md:px-12 fixed top-0 right-0 bg-white font-[poppins] w-full h-16 md:h-20 shadow-md border-b border-b-neutral-200 flex items-center justify-end'>
+        <div className='max-md:px-4 md:px-12 fixed top-0 right-0 bg-white font-[poppins] w-full h-16 md:h-20 shadow-md border-b border-b-neutral-200 flex items-center justify-between'>
+            <Menu onClick={() => setSidebarOpen(true)}></Menu>
             <ul className=" mb-0 flex items-center gap-3 md:gap-6" style={{padding:0}}>
-                <li className='relative cursor-pointer' onClick={() => {window.location.href = `${role != 'admin' ? '/transaksi-pending' : '/peminjaman'}`}}>
-                    <i className="bi bi-receipt text-xl md:text-2xl"></i>
-                    {role != "admin" && trxPending &&
-                        <div className='absolute top-0 left-3 bg-warning text-white text-[10px] md:text-xs rounded-pill text-center px-1'><i className="bi bi-exclamation text-xs"></i></div>
-                    }
-                </li>
                 <li id='profil' onMouseEnter={() => setProfileHover(true)} onMouseLeave={() => setProfileHover(false)} className='relative bg-indigo-500 w-8 h-8 md:w-10 md:h-10 rounded-full grid place-items-center font-medium text-lg md:text-2xl text-white border-2 border-indigo-600 duration-300 hover:border-indigo-900 cursor-pointer'>{users.profile.name.charAt(0)}
                     <div onClick={() => {setLogoutOn(true)}} className={`absolute top-[100%] ${profileHover == false ? "hidden" : ""} bg-white rounded border px-2 py-1 shadow-sm flex items-center justify-center gap-x-2`}>
                         <i className="bi bi-box-arrow-right text-red-800"></i>
@@ -78,15 +58,7 @@ const Navbar = () => {
                 </li>
             </ul>
 
-            <div className={`${logoutOn == true ? "" : "hidden"} absolute top-0 left-0 bg-[rgba(0,0,0,.4)] w-full h-screen flex items-center justify-center`}>
-                <div className=" px-6 py-5 bg-white rounded border">
-                    <p className="mb-0 text-xl text-neutral-700">Kamu yakin mau log out?</p>
-                    <div className="flex items-center justify-around mt-3">
-                        <button className="btn btn-outline-secondary" onClick={() => {setLogoutOn(false)}}>Engga</button>
-                        <button className="btn btn-outline-danger" onClick={() => {logout()}}>Yakin ko</button>
-                    </div>
-                </div>
-            </div>
+            <PopUpLogout show={logoutOn} setShow={setLogoutOn} onLogout={() => {logout()}} />
         </div>
         </>
 

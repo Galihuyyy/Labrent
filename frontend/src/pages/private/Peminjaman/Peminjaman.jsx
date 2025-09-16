@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import AdminPage from '../../../components/Layout/AdminPage'
-import { getRole, getToken } from '../../../utils/getToken'
+import { getToken } from '../../../utils/getToken'
 import { config } from '../../../config'
 import axios from 'axios'
 import Button from '../../../components/elements/Button'
@@ -10,9 +10,16 @@ import CardHeader from '../../../components/fragments/CardHeader'
 import ModalForm from './resource/ModalForm'
 import Transaksi from '../../public/transaksi/Transaksi'
 import { usePeminjaman } from '../../../hooks/HookPeminjaman'
+import useUser from '../../../hooks/HookUser'
 
 function Peminjaman() {
-    if (getRole() === 'siswa') {
+
+    const {fixRole, getUser} = useUser()
+    useEffect(() => {
+        getUser()
+    }, [])
+    
+    if (fixRole === 'siswa') {
         return <Transaksi />;
     }
 

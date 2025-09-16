@@ -71,12 +71,14 @@ export const DetailProduct = () => {
         </WithLoading>
       </div>
 
-      <footer className='fixed-bottom bg-white border shadow-sm w-full flex justify-center py-2 sm:hidden'>
-        <div className="flex items-center justify-end w-11/12 sm:w-9/12  gap-x-2">
-          <ButtonAddKeranjang qty={count} />
-          <ButtonPinjamSekarang qty={count} />
-        </div>
-      </footer>
+      {(detailAlat.stok > 0 && detailAlat.keterangan === 'aman') &&
+        <footer className='fixed-bottom bg-white border shadow-sm w-full flex justify-center py-2 sm:hidden'>
+          <div className="flex items-center justify-end w-11/12 sm:w-9/12  gap-x-2">
+            <ButtonAddKeranjang qty={count} />
+            <ButtonPinjamSekarang qty={count} />
+          </div>
+        </footer>
+      }
     </div>
   )
 }

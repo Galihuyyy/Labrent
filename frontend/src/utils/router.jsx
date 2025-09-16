@@ -11,8 +11,13 @@ import { DetailKeranjang } from "../pages/public/keranjang/DetailKeranjang"
 import { Invoice } from "../pages/public/transaksi/Invoice"
 import Transaksi from "../pages/public/transaksi/Transaksi"
 import CheckoutAlat from "../pages/public/alat/CheckoutAlat"
+import NotFound from "../pages/404"
 
 const router = createBrowserRouter([
+    {
+        path : '*',
+        element : <NotFound/>
+    },
     {
         path : '/auth',
         element : <Auth auth={false}> <Login/> </Auth>

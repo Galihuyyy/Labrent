@@ -1,13 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Navigate } from 'react-router-dom';
 import { getRole } from '../utils/getToken';
+import { config } from '../config';
+import axios from 'axios';
+import useUser from '../hooks/HookUser';
 
 const Auth = ({ children, auth, adminOnly = false }) => {
+  const { fixRole, getUser } = useUser()
   const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
+  useEffect(() => {
+    getUser()
+  }, [])
+
   if (auth) {
-    if (!token || (adminOnly && getRole() !== 'admin')) {
+    if (!token || (adminOnly && fixRole !== 'admin')) {
       return <Navigate to="/auth" replace />;
     }
     return children;
