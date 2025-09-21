@@ -59,14 +59,14 @@ class alatController extends Controller
                 });
 
             $alat_tidak_tersedia = $alat->filter(function ($a) {
-                return $a['stok'] == 0 || $a['keterangan'] !== 'aman';
+                return $a['stok'] == 0 || $a['keterangan'] !== 'Aman';
             })->values();
 
             if ($alat) {
                 return response()->json([
                     'message' => 'berhasil mendapatkan data alat!',
                     'data' => [
-                        "alat_tersedia" => $alat->where('stok', '>', 0)->where('status', 'aman')->values(),
+                        "alat_tersedia" => $alat->where('stok', '>', 0)->where('keterangan', 'Aman')->values(),
                         "alat_tidak_tersedia" => $alat_tidak_tersedia
                     ]
                 ], 200);

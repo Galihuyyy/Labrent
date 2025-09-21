@@ -53,14 +53,14 @@ export const DetailProduct = () => {
                 <label htmlFor="deskripsi" className='mb-2 text-black/75 font-medium text-sm'>Deskripsi</label>
                 <p id='deskripsi' className='text-black/50 text-sm'>{detailAlat?.deskripsi ?? 'No Description'}</p>
               </div>
-              {(detailAlat.stok > 0 && detailAlat.keterangan === 'aman') &&
+              {(detailAlat.stok > 0 && detailAlat.keterangan === 'Aman') &&
                 <Counter max={detailAlat?.stok} count={count} setCount={setCount}></Counter>
               }
               <Badge variant={'warning'}>
                 <i className="bi bi-info-circle-fill mr-1 text-[14px]"></i>
                 terpinjam
               </Badge>
-              {(detailAlat.stok > 0 && detailAlat.keterangan === 'aman') &&
+              {(detailAlat.stok > 0 && detailAlat.keterangan === 'Aman') &&
                 <div className="sm:flex items-center gap-x-3 hidden ms-6 mt-3">
                   <ButtonAddKeranjang qty={count} />
                   <ButtonPinjamSekarang qty={count} />
@@ -71,7 +71,7 @@ export const DetailProduct = () => {
         </WithLoading>
       </div>
 
-      {(detailAlat.stok > 0 && detailAlat.keterangan === 'aman') &&
+      {(detailAlat.stok > 0 && detailAlat.keterangan === 'Aman') &&
         <footer className='fixed-bottom bg-white border shadow-sm w-full flex justify-center py-2 sm:hidden'>
           <div className="flex items-center justify-end w-11/12 sm:w-9/12  gap-x-2">
             <ButtonAddKeranjang qty={count} />

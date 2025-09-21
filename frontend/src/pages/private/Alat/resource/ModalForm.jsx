@@ -1,6 +1,6 @@
 import Loader from "../../../../components/elements/Loader"
 
-function ModalForm({ form, onChange, onClose, onSubmit, mode, loading, onDelete }) {
+function ModalForm({ form, onChange, onClose, onSubmit, mode, loading, onDelete, previewFoto }) {
     const readonly = mode == "show"
   return (
     <div className="fixed-top min-h-svh w-full grid place-items-center bg-black/50">
@@ -69,9 +69,10 @@ function ModalForm({ form, onChange, onClose, onSubmit, mode, loading, onDelete 
                     <div className='mt-4'>
                         <label htmlFor="foto_alat" className="block text-sm font-medium text-gray-700 mb-1">
                             Foto Alat
-                        {form.foto_alat && (
+                        {(mode !== 'create' && form.foto_alat) && (
                             <img src={form.foto_alat} alt={"preview"} width={144} />
                         )}
+                        {(mode === 'create' && previewFoto) && <img src={previewFoto} alt="preview" width={144} />}
                         </label>
                         <input
                             disabled={readonly}

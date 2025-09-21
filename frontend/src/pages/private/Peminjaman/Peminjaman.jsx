@@ -11,18 +11,11 @@ import ModalForm from './resource/ModalForm'
 import Transaksi from '../../public/transaksi/Transaksi'
 import { usePeminjaman } from '../../../hooks/HookPeminjaman'
 import useUser from '../../../hooks/HookUser'
+import Spinner from '../../../components/elements/Spinner'
 
 function Peminjaman() {
 
     const {fixRole, getUser} = useUser()
-    useEffect(() => {
-        getUser()
-    }, [])
-    
-    if (fixRole === 'siswa') {
-        return <Transaksi />;
-    }
-
     const token = getToken()
     const apiUrl = config.API_URL
 
@@ -30,6 +23,14 @@ function Peminjaman() {
     const [mode, setMode] = useState(false)
 
     const { dataPeminjaman, getPeminjaman } = usePeminjaman()
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            await getUser();
+        };
+        fetchUser()
+    }, []);
+
     useEffect(() => {
         getPeminjaman(false)
     }, [])
@@ -39,26 +40,38 @@ function Peminjaman() {
         setMode(mode)
     }
 
-    return (
-        <AdminPage>
-            <div className="pt-4">
-                <CardHeader title="Manajemen Peminjaman">
-                    <div className='flex items-center gap-x-3'>
-                        <Button variant="outline-primary" className="!w-fit btn-sm !bg-blue-100 hover:!bg-blue-500 hover:!text-white" onClick={() => { openModalFn("confirm") }}>
-                            <Check />
-                            Setujui Permintaan
-                        </Button>
-                        <Button variant="outline-primary" className="!w-fit btn-sm !bg-blue-100 hover:!bg-blue-500 hover:!text-white" onClick={() => { openModalFn("return") }}>
-                            <Check />
-                            Peminjaman Dikembalikan
-                        </Button>
-                    </div>
-                </CardHeader>
-                <Table data={dataPeminjaman}></Table>
+    if (!fixRole) {
+        return (
+            <div className="w-full min-h-svh grid place-items-center">
+                <Spinner/>
             </div>
-            <ModalForm open={openModal} setOpenModal={setOpenModal} getPeminjaman={() => { getPeminjaman() }} mode={mode} />
-        </AdminPage>
-    )
+        )
+    }
+
+    if (fixRole === 'siswa') {
+        return <Transaksi />;
+    } else {
+        return (
+            <AdminPage>
+                <div className="pt-4">
+                    <CardHeader title="Manajemen Peminjaman">
+                        <div className='flex items-center gap-x-3'>
+                            <Button variant="outline-primary" className="!w-fit btn-sm !bg-blue-100 hover:!bg-blue-500 hover:!text-white" onClick={() => { openModalFn("confirm") }}>
+                                <Check />
+                                Setujui Permintaan
+                            </Button>
+                            <Button variant="outline-primary" className="!w-fit btn-sm !bg-blue-100 hover:!bg-blue-500 hover:!text-white" onClick={() => { openModalFn("return") }}>
+                                <Check />
+                                Peminjaman Dikembalikan
+                            </Button>
+                        </div>
+                    </CardHeader>
+                    <Table data={dataPeminjaman}></Table>
+                </div>
+                <ModalForm open={openModal} setOpenModal={setOpenModal} getPeminjaman={() => { getPeminjaman() }} mode={mode} />
+            </AdminPage>
+        )
+    }
 }
 
 export default Peminjaman

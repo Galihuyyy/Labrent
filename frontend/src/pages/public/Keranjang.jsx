@@ -180,6 +180,10 @@ export const useKeranjang = (apiUrl, token) => {
 		}
 	};
 
+	useEffect(() => {
+		getKeranjang()
+	}, [])
+
 	const toggleSelect = (id) => {
 		setSelectedIds((prev) =>
 			prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
