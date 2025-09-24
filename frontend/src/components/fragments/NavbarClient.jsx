@@ -1,33 +1,135 @@
-import React from 'react'
-import logo from '../../assets/images/logo.png'
-import { Search } from '@mui/icons-material'
+// src/components/fragments/NavbarClient.jsx
+import React, { useEffect, useRef, useState } from 'react';
+import logo from '../../assets/images/logo.png';
+import { ChevronRightOutlined, Receipt, Search, ShoppingCartOutlined } from '@mui/icons-material';
+import {Link} from 'react-router-dom'
+import Button from '../elements/Button';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { getToken } from '../../utils/getToken';
+import { config } from '../../config';
+import PopUpLogout from './PopUpLogout';
+
+const NavbarClient = ({ withSearch = false, onInputSearch, onClickSearch }) => {
+  const users = JSON.parse(localStorage.getItem("user") || sessionStorage.getItem("user") || "null");
+  const [openSearch, setOpenSearch] = useState(false);
+  const [profileClick, setProfileClick] = useState(false);
+  const inputSearchRef = useRef(null);
+  const profileRef = useRef(null);
+  const toggleProfileRef = useRef(null);
+  const [logoutClick, setLogoutClick] = useState(false)
+  const token = getToken()
+  const apiUrl = config.API_URL
+
+  const logout = () => {
+        const toastLogoutId = toast.loading("Melakukan logout...");
+    
+        axios.post(`${apiUrl}/auth/logout`, {}, {headers : {Authorization : `Bearer ${token}`}})
+        .then(res => {
+            localStorage.clear();
+            sessionStorage.clear(); 
+            toast.update(toastLogoutId, {
+                type : 'success',
+                render : res.data?.message || 'Berhasil logout!',
+                isLoading : false,
+                hideProgressBar : false,
+                autoClose : true,
+                closeButton : true
+            })
+            setTimeout(function() {
+                window.location.reload()
+            }, 1000);
+        })
+        .catch(err => {console.log(err);})
+    }
+  
+
+  useEffect(() => {
+    if (openSearch && inputSearchRef.current) {
+      inputSearchRef.current.focus();
+    }
+  }, [openSearch]);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (profileRef.current && !profileRef.current.contains(e.target) && toggleProfileRef.current && !toggleProfileRef.current.contains(e.target)) {
+        setProfileClick(false);
+      }
+    }
+
+    if (profileClick) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("scroll", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("scroll", handleClickOutside);
+    };
+  }, [profileClick]);
+
+  return (
+    <nav className="w-full bg-white fixed top-0 left-0 z-10 flex items-center justify-between px-6 md:px-12 h-16 md:h-18 shadow">
+      <div className="w-full flex items-center justify-between sm:border-r border-r-zinc-400 sm:pr-6 sm:mr-6 gap-x-12 ">
+        <Link to="/" className="icon">
+          <img src={logo} alt="labrent logo" className={`${withSearch ? 'w-22 sm:w-46' : 'w-22 sm:w-34'}`} />
+        </Link>
+        <div className={`search-field flex items-center rounded sm:outline sm:outline-zinc-400 gap-x-2 px-2 py-1 sm:w-full ${!withSearch ? "hidden" : "block"}`}>
+          <Search onClick={() => { setOpenSearch(!openSearch) }} sx={{ fontSize: "24px" }} className="sm:!hidden cursor-pointer" />
+          <div className={`max-sm:bg-white max-sm:absolute duration-200 top-full ${openSearch ? "h-fit" : "max-sm:h-0 max-sm:!py-0 max-sm:overflow-hidden"} left-0 w-full max-sm:px-6 max-sm:py-3 z-0`}>
+            <div className="max-sm:outline max-sm:outline-zinc-400 w-full h-fit flex items-center rounded pr-2">
+              <input
+                ref={inputSearchRef}
+                id='search'
+                onChange={(e) => { onInputSearch?.(e.target.value) }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    setOpenSearch(false);
+                    inputSearchRef.current.blur();
+                    onClickSearch?.();
+                  }
+                }}
+                type="text"
+                className="focus:outline-0 rounded w-full px-3 max-sm:py-1 sm:order-2"
+              />
+              <Search sx={{ fontSize: "24px" }} onClick={() => { onClickSearch?.() }} />
+              <button type='button' className='hidden sm:block sm:order-3' onClick={() => { onClickSearch?.() }}>cari</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center cursor-pointer relative" onClick={() => { setProfileClick(!profileClick) }} ref={toggleProfileRef}>
+        <Profile abjad={users?.profile?.name} />
+        <ChevronRightOutlined className='text-black/75 rotate-90' />
+
+        <div ref={profileRef} className={`bg-white rounded-sm border border-black/50 absolute duration-200 ${profileClick ? 'top-[130%] opacity-100 pointer-events-auto' : 'top-[100%] opacity-0 pointer-events-none'} right-0 w-52 sm:w-60 shadow-sm`}>
+          <div className="header p-3 border-b border-b-black/50 flex flex-column items-center">
+            <Profile abjad={users?.profile?.name} />
+            <p className='m-0 text-sm font-medium'>{users?.profile?.name}</p>
+            <p className='m-0 text-xs'>{users?.email}</p>
+            <Button onClick={() => setLogoutClick(true)} variant="outline-danger" className="!bg-red-100 !w-fit !py-0 !rounded-full mt-2 !text-red-600 hover:!bg-red-200">Logout</Button>
+          </div>
+          <div className="body flex items-start flex-column">
+            <Link to='/keranjang' className='text-sm !no-underline !text-black/75 hover:bg-neutral-100 w-full px-3 py-2.5'>
+              <ShoppingCartOutlined sx={{ fontSize:'22px' }}/>
+              <span className="ml-2">Keranjang Saya</span>
+            </Link>
+            <Link to="/peminjaman" className='text-sm !no-underline !text-black/75 hover:bg-neutral-100 w-full px-3 py-2.5'><Receipt sx={{ fontSize:'22px' }}/> <span className="ml-2">Peminjaman Saya</span></Link>
+          </div>
+        </div>
+      </div>
+      <PopUpLogout show={logoutClick} setShow={setLogoutClick} onLogout={() => {logout()}} />
+    </nav>
 
 
-const NavbarClient = ({ withSearch = false }) => {
-	const users = JSON.parse(localStorage.getItem("user") || sessionStorage.getItem("user"))
-
-	return (
-		<nav className='w-full bg-neutral-100 fixed-top flex items-center justify-content-between gap-x-6 px-12 h-18'>
-			<div className="w-full flex items-center justify-content-between border-r border-r-zinc-400 pr-6 gap-x-12">
-				<div className="icon">
-					<img src={logo} alt="labrent logo" width={144} />
-				</div>
-				<div className={`search-field flex items-center rounded outline outline-zinc-400 gap-x-2 px-2 py-1 w-full ${!withSearch ? 'opacity-0' : ''}`}>
-					<Search sx={{ fontSize: '24px' }} />
-					<input type="text" className='focus:outline-0 w-full' />
-				</div>
-			</div>
-			<div className="profile flex align-items-center gap-x-2">
-				<div className="profile-picture bg-indigo-800 border border-neutral-400 text-white w-8 h-8 rounded-full grid place-items-center text-lg">
-					{users?.profile.name.charAt(0)}
-				</div>
-				<div className="detail text-sm">
-					<h6 className='m-0'>{users?.profile.name}</h6>
-					<p className='m-0 text-xs'>{users?.email}</p>
-				</div>
-			</div>
-		</nav>
-	)
+  )
 }
 
 export default NavbarClient
+
+export const Profile = ({ abjad, className = "" }) => (
+  <div className={`profile-picture bg-indigo-800 border border-neutral-400 text-white w-9 h-9 rounded-full text-lg flex items-center justify-content-center ${className}`}>
+    <p className='m-0'>{abjad?.charAt(0)}</p>
+  </div>
+);

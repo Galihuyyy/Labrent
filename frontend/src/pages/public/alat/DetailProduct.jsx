@@ -1,0 +1,188 @@
+// src/pages/public/DetailProduct.jsx
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import NavbarClient from '../../../components/fragments/NavbarClient';
+import { config } from '../../../config';
+import axios from 'axios';
+import { getToken } from '../../../utils/getToken';
+import { toast, ToastContainer } from 'react-toastify';
+import useAlat from '../../../hooks/HookAlat';
+import WithLoading from '../../../components/Layout/WithLoading';
+import Spinner from '../../../components/elements/Spinner';
+import Badge from '../../../components/elements/Badge';
+import { useServices } from '../../../services/Services';
+
+
+export const DetailProduct = () => {
+  const { id } = useParams();
+  const apiUrl = config.API_URL;
+  const token = getToken();
+  const { loading, detailAlat, getDetailAlat } = useAlat();
+  const { getVariantByKeterangan } = useServices()
+  const [count, setCount] = useState(1);
+
+  useEffect(() => {
+    getDetailAlat(id);
+  }, [id]);
+
+  return (
+    <div className=''>
+      <NavbarClient withSearch={false} />
+      <div className="w-11/12 sm:w-9/12 py-24 mx-auto font-[poppins] text-neutral-800">
+        <ToastContainer position='top-center' theme='colored' />
+        <div className="flex items-center text-gray-600 text-sm mb-3">
+          <span className="cursor-pointer hover:text-indigo-500 transition" onClick={() => { window.location.href = "/" }} >
+            Home
+          </span>
+          <span className="mx-2">{'>'}</span>
+          <span className="text-gray-400">{detailAlat?.name}</span>
+        </div>
+
+        <WithLoading loading={loading}>
+          <div className="rounded-sm w-full shadow-sm border p-3 sm:px-12 grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-x-12">
+            <div className="max-w-sm">
+              <img className='w-full object-cover' src={detailAlat?.foto_alat} alt={detailAlat?.name} />
+            </div>
+            <div className='flex flex-column py-3'>
+              <div className="flex items-center">
+                <h3 className='!m-0'>{detailAlat?.name}</h3>
+                <p className='!m-0 !mx-3'>-</p>
+                <Badge variant={getVariantByKeterangan(detailAlat.keterangan)} className={'!ms-0 !mt-0'}>{detailAlat?.keterangan}</Badge>
+              </div>
+              <div className="deskripsi sm:pe-24 bg-neutral-50 sm:ps-6">
+                <label htmlFor="deskripsi" className='mb-2 text-black/75 font-medium text-sm'>Deskripsi</label>
+                <p id='deskripsi' className='text-black/50 text-sm'>{detailAlat?.deskripsi ?? 'No Description'}</p>
+              </div>
+              {(detailAlat.stok > 0 && detailAlat.keterangan === 'Aman') &&
+                <Counter max={detailAlat?.stok} count={count} setCount={setCount}></Counter>
+              }
+              <Badge variant={'warning'}>
+                <i className="bi bi-info-circle-fill mr-1 text-[14px]"></i>
+                terpinjam
+              </Badge>
+              {(detailAlat.stok > 0 && detailAlat.keterangan === 'Aman') &&
+                <div className="sm:flex items-center gap-x-3 hidden ms-6 mt-3">
+                  <ButtonAddKeranjang qty={count} />
+                  <ButtonPinjamSekarang qty={count} />
+                </div>
+              }
+            </div>
+          </div>
+        </WithLoading>
+      </div>
+
+      {(detailAlat.stok > 0 && detailAlat.keterangan === 'Aman') &&
+        <footer className='fixed-bottom bg-white border shadow-sm w-full flex justify-center py-2 sm:hidden'>
+          <div className="flex items-center justify-end w-11/12 sm:w-9/12  gap-x-2">
+            <ButtonAddKeranjang qty={count} />
+            <ButtonPinjamSekarang qty={count} />
+          </div>
+        </footer>
+      }
+    </div>
+  )
+}
+
+export const Counter = ({ max = 10, count, setCount, className = "" }) => {
+  const handleDecrease = () => {
+    setCount(prev => Math.max(1, prev - 1))
+  }
+
+  const handleIncrease = () => {
+    setCount(prev => Math.min(max, prev + 1))
+  }
+
+  const handleChange = (e) => {
+    const val = Number(e.target.value)
+    if (!isNaN(val)) {
+      setCount(Math.min(max, Math.max(1, val)))
+    }
+  }
+
+  return (
+    <div className={`w-fit h-max flex items-center border border-neutral-200 rounded overflow-hidden sm:ms-6 my-2 ${className}`}>
+      <button onClick={handleDecrease}
+        className="bg-neutral-100 text-neutral-400 px-2 h-full"
+      >
+        <i className="bi bi-dash text-xl"></i>
+      </button>
+
+      <input type="number" value={count} onChange={handleChange}
+        className="w-12 h-full text-center !text-sm 
+                  [appearance:textfield] 
+                  [&::-webkit-outer-spin-button]:appearance-none 
+                  [&::-webkit-inner-spin-button]:appearance-none"
+      />
+
+      <button onClick={handleIncrease}
+        className="bg-neutral-100 text-neutral-400 px-2 h-full"
+      >
+        <i className="bi bi-plus text-xl"></i>
+      </button>
+    </div>
+  )
+}
+
+// ButtonAddKeranjang
+export const ButtonAddKeranjang = ({ qty }) => {
+  const { id } = useParams();
+  const apiUrl = config.API_URL;
+  const token = getToken();
+  const [loadingAddKeranjang, setLoadingAddKeranjang] = useState(false);
+
+  async function handleAddKeranjang() {
+    try {
+      setLoadingAddKeranjang(true);
+      const res = await axios.post(`${apiUrl}/keranjang`, {
+        alat_id: id,
+        qty: qty
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success(res.data?.message || "Berhasil ditambahkan ke keranjang");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error.message || "Terjadi kesalahan");
+    } finally {
+      setLoadingAddKeranjang(false);
+    }
+  }
+
+  return (
+    <button
+      className="relative max-w-fit py-2 px-3 !rounded-sm text-indigo-600 !text-sm bg-indigo-100 outline outline-indigo-600 hover:bg-indigo-50 duration-200"
+      onClick={handleAddKeranjang}
+      disabled={loadingAddKeranjang}
+    >
+      {loadingAddKeranjang && (
+        <span className="absolute inset-0 flex items-center justify-center">
+          <Spinner />
+        </span>
+      )}
+      <span className={loadingAddKeranjang ? "opacity-0" : "opacity-100"}>
+        Tambah Keranjang
+      </span>
+    </button>
+  )
+}
+
+export const ButtonPinjamSekarang = ({ qty }) => {
+  const { id } = useParams();
+  const [loading, setLoading] = useState()
+  const pinjamLangsung = () => {
+    try {
+      sessionStorage.getItem('selectedIdAlat') ? sessionStorage.removeItem('selectedIdAlat') : ''
+      sessionStorage.getItem('selectedIdKeranjang') ? sessionStorage.removeItem('selectedIdKeranjang') : ''
+      sessionStorage.setItem('selectedIdAlat', JSON.stringify({ id: Number(id), qty: qty }))
+      setTimeout(function () {
+        window.location.href = `/detail/${id}/checkout`
+      }, 500);
+    } catch (error) {
+      console.error("Gagal checkout:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  return (
+    <button className='max-w-fit py-2 px-3 !rounded-sm text-white !text-sm bg-indigo-600 hover:bg-indigo-500 duration-200' onClick={() => { pinjamLangsung() }}>
+      Pinjam Sekarang
+    </button>
+  )
+}

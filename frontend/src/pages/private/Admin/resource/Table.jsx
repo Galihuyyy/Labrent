@@ -4,12 +4,12 @@ import no_data from "../../../../assets/images/no-data.png"
 const Table = (props) => {
   return (
 	<div className="w-auto overflow-x-auto mt-4 bg-white p-6 rounded-xl shadow-xl shadow-neutral-200">
-		<h4 className="!text-xl flex items-center gap-x-2 !text-gray-600 mb-2">{props.icon ?? ""}{props.title}</h4>
+		<h4 className="!text-xl flex items-center gap-x-2 !text-gray-600 mb-3">{props.icon ?? ""}{props.title}</h4>
 		<Loader show={props.loading}/>
 		{!props.loading &&
 			<table className="min-w-[600px] w-full text-sm text-left">
 				<thead className="bg-gray-100 text-gray-600 uppercase">
-				<tr>
+				<tr className="[&>th]:!font-semibold">
 					<th className="px-4 py-2" width="5%">No</th>
 					<th className="px-4 py-2" width="15%">Name</th>
 					<th className="px-4 py-2" width="15%">Username</th>
@@ -31,13 +31,13 @@ const Table = (props) => {
 							<td className="px-4 py-2">{item.profile.no_telp}</td>
 							<td className="px-4 py-2">
 								<div className="flex items-center gap-x-2">
-									<button onClick={() => props.onShow('show', item)} className="btn btn-sm btn-primary">
+									<button onClick={() => props.onShow('show', item)} className="btn btn-sm btn-outline-primary !bg-blue-100 hover:!bg-blue-500 hover:!text-white">
 										<i className="bi bi-search"></i>
 									</button>
-									<button onClick={() => props.onEdit('edit', item)} className="btn btn-sm btn-success">
+									<button onClick={() => props.onEdit('edit', item)} className="btn btn-sm btn-outline-success !bg-green-100 hover:!bg-green-700 hover:!text-white">
 										<i className="bi bi-pencil"></i>
 									</button>
-									<button onClick={() => props.onDelete('delete', item)} className="btn btn-sm btn-danger">
+									<button onClick={() => props.onDelete('delete', item)} className="btn btn-sm btn-outline-danger !bg-red-100 hover:!bg-red-500 hover:!text-white">
 										<i className="bi bi-trash"></i>
 									</button>
 								</div>

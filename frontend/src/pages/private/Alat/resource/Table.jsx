@@ -1,7 +1,10 @@
-import Loader from "../../../elements/Loader"
+import Loader from "../../../../components/elements/Loader"
 import no_data from "../../../../assets/images/no-data.png"
+import Badge from "../../../../components/elements/Badge"
+import { useServices } from "../../../../services/Services"
 
 const Table = (props) => {
+	const { getVariantByKeterangan } = useServices()
   return (
 	<div className="w-auto overflow-x-auto mt-4 bg-white p-6 rounded-xl shadow-xl shadow-neutral-200">
 		<h4 className="!text-xl flex items-center gap-x-2 !text-gray-600 mb-2">{props.icon ?? ""}{props.title}</h4>
@@ -11,7 +14,7 @@ const Table = (props) => {
 				<thead className="bg-gray-100 text-gray-600 uppercase">
 				<tr>
 					<th className="px-4 py-2" width="5%">No</th>
-					<th className="px-4 py-2" width="10%">Foto Alat</th>
+					<th className="px-4 py-2" width="15%">Foto Alat</th>
 					<th className="px-4 py-2" width="15%">Name</th>
 					<th className="px-4 py-2" width="50%">Deskripsi</th>
 					<th className="px-4 py-2" width="5%">Stok</th>
@@ -24,24 +27,26 @@ const Table = (props) => {
 					props.data?.map((item, i) => (
 						<tr key={i} className={`hover:bg-gray-50`}>
 							<td className="px-4 py-2 text-center">{i + 1}</td>
-							<td className="ps-3 py-2 items">
+							<td className="ps-3 py-2">
 								<div className="w-16 h-16 overflow-hidden">
 									<img src={item.foto_alat} className="w-full h-full object-cover object-center" />
 								</div>
 							</td>
 							<td className="px-4 py-2">{item.name}</td>
 							<td className="px-4 py-2">{item.deskripsi}</td>
-							<td className="px-4 py-2">{item.stok}</td>
-							<td className="px-4 py-2">{item.keterangan}</td>
+							<td className="px-4 py-2 text-center">{item.stok}</td>
+							<td className="px-4 py-2">
+								<Badge variant={getVariantByKeterangan(item.keterangan)} className={'!m-0'}>{item.keterangan}</Badge>
+							</td>
 							<td className="px-4 py-2">
 								<div className="flex items-center gap-x-2">
-									<button onClick={() => props.onShow('show', item)} className="btn btn-sm btn-primary">
+									<button onClick={() => props.onShow('show', item)} className="btn btn-sm btn-outline-primary !bg-blue-100 hover:!bg-blue-500 hover:!text-white">
 										<i className="bi bi-search"></i>
 									</button>
-									<button onClick={() => props.onEdit('edit', item)} className="btn btn-sm btn-success">
+									<button onClick={() => props.onEdit('edit', item)} className="btn btn-sm btn-outline-success !bg-green-50 hover:!bg-green-700 hover:!text-white">
 										<i className="bi bi-pencil"></i>
 									</button>
-									<button onClick={() => props.onDelete('delete', item)} className="btn btn-sm btn-danger">
+									<button onClick={() => props.onDelete('delete', item)} className="btn btn-sm btn-outline-danger !bg-red-100 hover:!bg-red-500 hover:!text-white">
 										<i className="bi bi-trash"></i>
 									</button>
 								</div>

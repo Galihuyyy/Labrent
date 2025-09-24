@@ -1,22 +1,24 @@
 import React, { useEffect, useState } from 'react'
-import Navbar from '../../components/fragments/Navbar'
-import { ProductList } from '../../components/pages/ProductList'
-import Alat from '../../components/pages/Alat/Alat'
+import Navbar from '../components/fragments/Navbar'
+import Alat from './private/Alat/Alat'
+import { ProductList } from './public/alat/ProductList'
+import useUser from '../hooks/HookUser'
 
 export const Home = () => {
 
   const users = JSON.parse(localStorage.getItem("user") || sessionStorage.getItem("user"))
-  const role = localStorage.getItem('role') || sessionStorage.getItem('role')
-
-
+  const {fixRole, getUser} = useUser()
+  useEffect(() => {
+    getUser()
+  }, [])
   
   return (
     <div className='font-[poppins] bg-neutral-100 min-h-svh'>
-        {role == "siswa" &&
+        {fixRole == "siswa" &&
           <ProductList/>
         }
         
-        {role == "admin" && 
+        {fixRole == "admin" && 
           <Alat/>
         }
     </div>

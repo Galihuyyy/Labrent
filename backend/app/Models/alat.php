@@ -4,17 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class alat extends Model
+class Alat extends Model
 {
-    protected $table = 'alat';
+    protected $table = 'tr_alat';
     protected $guarded = [];
 
 
     public function foto_alat () {
-        return $this->hasOne(foto_alat::class, 'alat_id', 'id');
+        return $this->hasOne(FotoAlat::class, 'alat_id', 'id');
     }
 
     public function peminjaman () {
-        return $this->hasMany(peminjaman::class, 'alat_id', 'id');
+        return $this->hasMany(transaksi::class, 'alat_id', 'id');
     }
 }

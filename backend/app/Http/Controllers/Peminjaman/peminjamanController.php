@@ -11,11 +11,13 @@ use App\Models\Ulasan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class peminjamanController extends Controller
 {
 
-    private function  generateCode($number){
+    private function  generateCode($number)
+    {
         $prefix = 'TRX' . date('Ymd') . str_pad($number, 4, '0', STR_PAD_LEFT);
         return $prefix;
     }
@@ -24,13 +26,13 @@ class peminjamanController extends Controller
     public function addToCart(Request $request)
     {
         $request->validate([
-            'alat_id' => 'required|exists:alat,id',
+            'alat_id' => 'required|exists:tr_alat,id',
             'jumlah' => 'required|integer|min:1'
         ]);
 
         $profile_id = Auth::user()->profile->id;
 
-        $peminjaman = Peminjaman::create([
+        $peminjaman = Transaksi::create([
             'alat_id' => $request->alat_id,
             'jumlah' => $request->jumlah,
             'transaksi_id' => null,
@@ -47,7 +49,7 @@ class peminjamanController extends Controller
     public function viewCart()
     {
         $profile_id = Auth::user()->id;
-        $items = Peminjaman::with('alat')
+        $items = Transaksi::with('alat')
             ->where('peminjam_id', $profile_id)
             ->whereNull('transaksi_id')
             ->get();
@@ -62,31 +64,35 @@ class peminjamanController extends Controller
     public function checkout(Request $request)
     {
         $user_id = auth()->user()->id;
-        $peminjaman_id = $request->input('peminjaman_id');
+        $keranjang = $request->input('keranjang');
 
-        $transaksi = Transaksi::create([
-            'peminjam_id' => $user_id,
-            "tanggal_pinjam" => now(),
-            "tanggal_kembali" => now()->addDays(3),
-            "status" => "pending"
-        ]);
+        DB::beginTransaction();
 
-        foreach ($peminjaman_id as $id) {
-            Peminjaman::where('id', $id)
-                ->where('peminjam_id', $user_id)
-                ->update(['transaksi_id' => $transaksi->id]);
-        }
+        try {
+            $transaksi = Transaksi::create([
+                'peminjam_id' => $user_id,
+                "tanggal_pinjam" => now(),
+                "tanggal_kembali" => now()->addDays(3),
+                "status" => "pending"
+            ]);
 
-        if (!$transaksi) {
+            foreach ($keranjang as $item) {
+                $transaksi->transaksi_details()->create([
+                    'alat_id' => $item->alat_id,
+                    'jumlah' => $item->qty,
+                ]);
+            }
+
             return response()->json([
-                "message" => "gagal melakukan checkout"
-            ], 500);
+                "message" => "berhasil checkout",
+                "transaksi_id" => $transaksi->id
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => "Gagal melakukan checkout",
+                'error' => $th->getMessage()
+            ], $th->getCode());
         }
-
-        return response()->json([
-            "message" => "berhasil checkout",
-            "transaksi_id" => $transaksi->id
-        ], 200);
     }
 
     // 4. Konfirmasi oleh admin
@@ -123,31 +129,6 @@ class peminjamanController extends Controller
     }
 
     // 6. Tambah ulasan setelah pengembalian
-    public function tambahUlasan(Request $request)
-    {
-        $request->validate([
-            'peminjaman_id' => 'required|exists:peminjaman,id',
-            'rating' => 'required|integer|min:1|max:5',
-            'komentar' => 'nullable|string'
-        ]);
-
-        $peminjaman = Peminjaman::find($request->peminjaman_id);
-
-        if ($peminjaman->transaksi->status !== 'dikembalikan') {
-            return response()->json(['message' => 'Belum bisa ulasan sebelum pengembalian'], 403);
-        }
-
-        $ulasan = Ulasan::create([
-            'peminjaman_id' => $request->peminjaman_id,
-            'rating' => $request->rating,
-            'komentar' => $request->komentar,
-        ]);
-
-        return response()->json([
-            'message' => 'Ulasan berhasil ditambahkan',
-            'data' => $ulasan
-        ], 201);
-    }
 
     public function transaksiPending(string $id)
     {
@@ -175,11 +156,13 @@ class peminjamanController extends Controller
         ]);
     }
 
-    public function getTransaksi()
+    public function getTransaksi(Request $request)
     {
 
         $transaksi = Transaksi::with(['transaksi_details.alat', 'peminjam.profile'])
+            ->when($request->transaksi_user, fn($q) => $q->where('peminjam_id', auth()->id()))
             ->get();
+
 
         return response()->json([
             'message' => 'Riwayat transaksi berhasil diambil',
@@ -187,11 +170,36 @@ class peminjamanController extends Controller
         ]);
     }
 
+    public function showTransaksi(Request $request, string $id)
+    {
+        $transaksi = Transaksi::with(['transaksi_details.alat', 'peminjam.profile'])
+            ->findOrFail($id);
+
+        return response()->json([
+            'message' => 'Detail transaksi berhasil diambil',
+            'data' => [
+                'status'          => $transaksi->status,
+                'nama_peminjam'   => $transaksi->nama_peminjam,
+                'email_peminjam'  => $transaksi->peminjam?->email,
+                'tanggal_pinjam'  => $transaksi->tanggal_pinjam,
+                'tanggal_kembali' => $transaksi->tanggal_kembali,
+
+                'transaksi_details' => $transaksi->transaksi_details?->map(function ($detail) {
+                    return [
+                        'jumlah' => $detail->jumlah,
+                        'nama_alat'   => $detail->alat->name ?? null,
+                        'keterangan_alat' => $detail->alat->keterangan ?? null,
+                    ];
+                }),
+            ]
+        ]);
+    }
+
     public function pinjamLangsung(Request $request)
     {
 
         $request->validate([
-            'alat_id' => 'required|exists:alat,id',
+            'alat_id' => 'required|exists:tr_alat,id',
             'jumlah' => 'required|integer|min:1'
         ]);
 

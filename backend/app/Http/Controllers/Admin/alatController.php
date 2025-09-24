@@ -35,35 +35,48 @@ class alatController extends Controller
         }
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $alat = Alat::with('foto_alat')->orderByDesc('created_at')->get()
-            ->map(function ($item) {
-                return [
-                    'id' => $item->id,
-                    'name' => $item->name,
-                    'deskripsi' => $item->deskripsi,
-                    'stok' => $item->stok,
-                    'keterangan' => $item->keterangan,
-                    'foto_alat' =>  asset('storage/' .  $item->foto_alat?->foto ?? ''),
-                    'created_at' => $item->created_at,
-                    'updated_at' => $item->updated_at,
-                ];
-            });
+        $search = $request->input('search');
+        try {
+            $alat = Alat::with('foto_alat')
+                ->when($search, function ($query, $search) {
+                    $query->where('name', 'like', "%{$search}%");
+                })
+                ->orderByDesc('created_at')
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'name' => $item->name,
+                        'deskripsi' => $item->deskripsi,
+                        'stok' => $item->stok,
+                        'keterangan' => $item->keterangan,
+                        'foto_alat' =>  asset('storage/' .  $item->foto_alat?->foto ?? ''),
+                        'created_at' => $item->created_at,
+                        'updated_at' => $item->updated_at,
+                    ];
+                });
 
-        if ($alat) {
+            $alat_tidak_tersedia = $alat->filter(function ($a) {
+                return $a['stok'] == 0 || $a['keterangan'] !== 'Aman';
+            })->values();
+
+            if ($alat) {
+                return response()->json([
+                    'message' => 'berhasil mendapatkan data alat!',
+                    'data' => [
+                        "alat_tersedia" => $alat->where('stok', '>', 0)->where('keterangan', 'Aman')->values(),
+                        "alat_tidak_tersedia" => $alat_tidak_tersedia
+                    ]
+                ], 200);
+            }
+        } catch (\Throwable $th) {
             return response()->json([
-                'message' => 'berhasil mendapatkan data alat!',
-                'data' => [
-                    "alat_tersedia" => $alat->where('stok', '>', 0)->values(),
-                    "alat_tidak_tersedia" => $alat->where('stok', '=', 0)->values()
-                ]
-            ], 200);
+                'message' => 'gagal mendapatkan alat',
+                'error' => $th->getMessage()
+            ], 500);
         }
-
-        return response()->json([
-            'message' => 'gagal mendapatkan alat'
-        ], 500);
     }
 
 

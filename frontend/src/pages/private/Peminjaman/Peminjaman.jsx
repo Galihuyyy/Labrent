@@ -8,80 +8,70 @@ import { Add, Check } from '@mui/icons-material'
 import Table from './resource/Table'
 import CardHeader from '../../../components/fragments/CardHeader'
 import ModalForm from './resource/ModalForm'
+import Transaksi from '../../public/transaksi/Transaksi'
+import { usePeminjaman } from '../../../hooks/HookPeminjaman'
+import useUser from '../../../hooks/HookUser'
+import Spinner from '../../../components/elements/Spinner'
 
 function Peminjaman() {
 
+    const {fixRole, getUser} = useUser()
     const token = getToken()
     const apiUrl = config.API_URL
 
     const [openModal, setOpenModal] = useState(false)
     const [mode, setMode] = useState(false)
 
-    const [dataPeminjaman, setDataPeminjaman] = useState([{
-        peminjaman: {
-            peminjam: {
-                profile: {}
-            }
-        }
-    }])
+    const { dataPeminjaman, getPeminjaman } = usePeminjaman()
 
-    const getPeminjaman = () => {
-        axios.get(`${apiUrl}/transaksi/get`, { headers: { Authorization: `Bearer ${token}` } })
-            .then(res => {
-                console.log(res.data.data)
-                setDataPeminjaman(res.data.data)
-            })
-            .catch(err => {
-                console.log(err)
-            })
-    }
+    useEffect(() => {
+        const fetchUser = async () => {
+            await getUser();
+        };
+        fetchUser()
+    }, []);
+
+    useEffect(() => {
+        getPeminjaman(false)
+    }, [])
 
     const openModalFn = (mode) => {
         setOpenModal(true)
         setMode(mode)
     }
 
-    const hapusTrx = (id) => {
-
-        const yakin = confirm(`yakin ingin hapus transaksi id ${id} ? `)
-
-        if (!yakin) {
-            return
-        }
-
-        axios.delete(`${apiUrl}/admin/transaksi/delete/${id}`, { headers: { Authorization: `Bearer ${token}` } })
-            .then(res => {
-                window.location.reload()
-            })
-            .catch(err => {
-                console.log(err)
-            })
+    if (!fixRole) {
+        return (
+            <div className="w-full min-h-svh grid place-items-center">
+                <Spinner/>
+            </div>
+        )
     }
 
-    useEffect(() => {
-        getPeminjaman()
-    }, [])
-
-    return (
-        <AdminPage>
-            <div className="pt-4">
-                <CardHeader title="Manajemen Peminjaman">
-                    <div className='flex items-center gap-x-3'>
-                        <Button variant="primary" className="!w-fit" onClick={() => { openModalFn("confirm") }}>
-                            <Check />
-                            Setujui Permintaan
-                        </Button>
-                        <Button variant="primary" className="!w-fit" onClick={() => { openModalFn("return") }}>
-                            <Check />
-                            Peminjaman Dikembalikan
-                        </Button>
-                    </div>
-                </CardHeader>
-                <Table data={dataPeminjaman}></Table>
-            </div>
-            <ModalForm open={openModal} setOpenModal={setOpenModal} getPeminjaman={() => {getPeminjaman()}} mode={mode}/>
-        </AdminPage>
-    )
+    if (fixRole === 'siswa') {
+        return <Transaksi />;
+    } else {
+        return (
+            <AdminPage>
+                <div className="pt-4">
+                    <CardHeader title="Manajemen Peminjaman">
+                        <div className='flex items-center gap-x-3'>
+                            <Button variant="outline-primary" className="!w-fit btn-sm !bg-blue-100 hover:!bg-blue-500 hover:!text-white" onClick={() => { openModalFn("confirm") }}>
+                                <Check />
+                                Setujui Permintaan
+                            </Button>
+                            <Button variant="outline-primary" className="!w-fit btn-sm !bg-blue-100 hover:!bg-blue-500 hover:!text-white" onClick={() => { openModalFn("return") }}>
+                                <Check />
+                                Peminjaman Dikembalikan
+                            </Button>
+                        </div>
+                    </CardHeader>
+                    <Table data={dataPeminjaman}></Table>
+                </div>
+                <ModalForm open={openModal} setOpenModal={setOpenModal} getPeminjaman={() => { getPeminjaman() }} mode={mode} />
+            </AdminPage>
+        )
+    }
 }
 
 export default Peminjaman

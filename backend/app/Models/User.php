@@ -42,11 +42,15 @@ class User extends Authenticatable
      */
 
      public function profile() {
-        return $this->hasOne(profile::class);
+        return $this->hasOne(Profile::class);
      }
 
      public function transaksi() {
-        return $this->hasOne(transaksi::class, 'peminjam_id', 'id');
+        return $this->hasOne(Transaksi::class, 'peminjam_id', 'id');
+     }
+
+     public function keranjang() {
+         return $this->hasMany(Keranjang::class, 'peminjam_id', 'id');
      }
      
     protected function casts(): array

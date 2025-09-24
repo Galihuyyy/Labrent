@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('transaksi', function (Blueprint $table) {
+        Schema::create('tr_transaksi', function (Blueprint $table) {
             $table->id();
             $table->string('transaksi_code')->nullable();
-            $table->foreignId("peminjam_id")->constrained('profile')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId("peminjam_id")->constrained('tr_profile')->onDelete('cascade')->onUpdate('cascade');
+            $table->string("nama_peminjam");
             $table->date('tanggal_pinjam');
             $table->date('tanggal_kembali')->nullable();
             $table->enum('status', ['dipinjam','dikembalikan', 'ditolak', 'pending', 'expired']);
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('transaksi');
+        Schema::dropIfExists('tr_transaksi');
     }
 };

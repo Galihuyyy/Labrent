@@ -186,7 +186,7 @@ const Login = () => {
 
 
     return (
-        <div className='w-full min-h-screen bg-indigo-100 flex items-center justify-center'>
+        <div className='w-full min-h-full bg-indigo-100 flex items-center justify-center'>
             <ToastContainer
                 position='top-center'
                 theme='colored'
@@ -198,7 +198,7 @@ const Login = () => {
                     <div className="w-full px-3 flex justify-between text-sm mt-6 mb-3">
                         <div className='flex items-center'>
                             <input type="checkbox" name="rememberMe" id="rememberMe" checked={dataLogin.rememberMe} onChange={(e) => { setDataLogin({ ...dataLogin, rememberMe: e.target.checked }) }} />
-                            <label htmlFor='rememberMe' className="font-medium text-neutral-500">remember me!</label>
+                            <label htmlFor='rememberMe' className="font-medium text-neutral-500 ms-2">remember me!</label>
                         </div>
                     </div>
                     <Button variant="primary rounded-pill mb-3" onClick={() => { handleLogin() }}>Login</Button>

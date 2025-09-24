@@ -7,3 +7,8 @@
 .font-montserrat {
     font-family: 'Montserrat Variable', sans-serif;
 }
+
+a {
+    text-decoration: none;
+    color: #27272a;
+}
